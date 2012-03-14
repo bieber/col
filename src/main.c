@@ -28,28 +28,18 @@ int main(int argc, char *argv[])
     int i;
     struct list *list = list_new();
 
-    for(i = 1; i < 13; i++)
+    for(i = 0; i < 8; i++)
     {
         list_push_back(list, (void*)i);
     }
 
-    for(i = 0; i < 12; i++)
-    {
-        printf("%d: ", list->count);
-        printf("%d\n", (int)list_pop(list));
-    }
+    for(i = 0; i < 8; i += 2)
+        list_remove(list, i);
 
-    for(i = 1; i < 13; i++)
+    for(i = 0; i < list->count; i++)
     {
-        list_push(list, (void*)i);
+        printf("%d\n", list_get(list, i));
     }
-
-    for(i = 0; i < 12; i++)
-    {
-        printf("%d: ", list->count);
-        printf("%d\n", (int)list_pop_back(list));
-    }
-
 
     return 0;
 }

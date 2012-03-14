@@ -129,6 +129,69 @@ void list_push_back(struct list *list, void *element)
 }
 
 // Fetches an item from the list
-void *list_get(struct list *list, int element);
+void *list_get(struct list *list, int element)
+{
+    int i;
+    struct list_node *src = NULL;
+    
+    if(element >= list->count || element < 0)
+    {
+        // Out-of-bounds index
+        return NULL;
+    }
+    else if(element < list->count / 2)
+    {
+        // Fetching from front half of list
+        src = list->front;
+        for(i = 0; i < element; i++)
+            src = src->next;
+    }
+    else
+    {
+        // Back half of list
+        src = list->back;
+        for(i = 0; i < list->count - element - 1; i++)
+            src = src->prev;
+    }
+
+    return src->data;
+}
 // Removes an item from the list
-void *list_remove(struct list *list, int element);
+void *list_remove(struct list *list, int element)
+{
+    int i;
+    struct list_node *old = NULL;
+
+    if(element >= list->count || element < 0)
+    {
+        // Index out of bounds
+        return;
+    }
+    else if(element < list->count / 2)
+    {
+        // Searching from front of list
+        old = list->front;
+        for(i = 0; i < element; i++)
+            old = old->next;
+    }
+    else
+    {
+        // Searching from back of list
+        old = list->back;
+        for(i = 0; i < list->count - element - 1; i++)
+            old = old->prev;
+    }
+
+    if(old->prev)
+        old->prev->next = old->next;
+    else
+        list->front = old->next;
+
+    if(old->next)
+        old->next->prev = old->prev;
+    else
+        list->back = old->prev;
+
+    free(old);
+    list->count--;
+}
