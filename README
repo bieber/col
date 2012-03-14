@@ -1,0 +1,88 @@
+Copyright 2012, Robert Bieber
+
+col is a simple programming language, inspired by John Backus' FP language, 
+although not strictly adhering to it.  Currently the interpreter only supports 
+file execution, a full REPL environment will come later.  To execute a file, 
+simply run
+
+col /path/to/program.col [optional command line arguments]
+
+and the interpreter will load the code in program.col and execute its main
+function.  The main function is called with any command-line arguments passed
+to it as a sequence of strings (see language reference for details).
+
+-------------------
+LANGUAGE REFERENCE 
+-------------------
+
+1 - Constants and Identifiers
+  Allowable constants in col are numbers, characters, strings, bottom,
+  true or false, and sequences.  
+  
+  A constant number is any integer or floating point number, with an optional 
+  +/- in front of it.  Numbers may also be specified in scientific notation.
+  Examples of valid numerical constants:
+    5
+    5.2
+    +5.2
+    -5.2
+    0.2
+    .2
+    5.2e12
+    5.2E12
+  
+  A character is any character enclosed in single quote marks.  Alternatively, 
+  some two-character escape sequences are allowed using the backslash.  Valid 
+  escape sequences are listed below:
+    \\ - Backslash
+    \' - Single quote
+    \n - Newline
+    \t - Tab character
+    
+  A string is any series of characters enclosed in double quote marks.  Strings 
+  also support two-character escape sequences using the backslash.  All of the 
+  escape sequences used in characters are supported with the exception of the 
+  single quote, which need not be escaped in a string.  Instead, the double 
+  quote may be escaped in strings.  Valid escape sequences are listed below:
+    \\ - Backslash
+    \" - Double quote
+    \n - Newline
+    \t - Tab character
+  
+  Bottom represents an undefined value.  Sequences and functions in col are 
+  bottom-preserving.  This means that any sequence which contains bottom as an
+  element is equivalent to bottom, and any function that accepts bottom as an
+  argument will return bottom as its result.  Bottom is simply written in 
+  lowercase text as follows:
+    bottom
+    
+  Logical true and false are simply written in lowercase text, as follows:
+    true
+    false
+  
+  A sequence is any series of valid constants surrounded by angle brackets and 
+  separated by commas.  A sequence may be any length, and its elements need not
+  be of the same type.  Examples of valid sequence constants:
+    <1, 2, 3>
+    <"Sequence", "of", "strings">
+    <"Nested", <"Sequence", true>>
+    
+  An identifier is any combination of lower or uppercase letters, numbers, and 
+  the symbols +, -, *, /, !, _, and -, with some caveats.  An identifier must 
+  not contain two simultaneous slashes, because // marks the rest of the line as
+  a comment, telling the reader to ignore it.  An identifier must not be of a 
+  form that could be read as a number: any text which is a valid numerical 
+  constant will be read as one, and never as an identifier.  Identifiers also 
+  cannot use the reserved words bottom, true, or false, and using the name of a
+  built-in function or functional form as an identifier will cause an error.
+  Examples of valid identifiers:
+    my-function
+    my_function
+    1+
+    !
+    2.2.2
+  In the interest of readability, it is advisable to avoid using identifiers 
+  that might be too easily mistaken for numbers, but any combination of the 
+  allowable characters that cannot be read as a number will be read as a valid 
+  identifier.
+  
