@@ -18,30 +18,10 @@
  *
  **/
 
-#include <stdio.h>
+#ifndef FILE_H
+#define FILE_H
 
-#include "file.h"
-#include "lexer.h"
-#include "list.h"
+// Reads a file into a string buffer
+char *read_file(const char *file);
 
-int main(int argc, char *argv[])
-{
-    char *input;
-    
-    if(argc < 2)
-    {
-        printf("Usage: col <source file> [command-line arguments]\n");
-        return 1;
-    }
-
-    input = read_file(argv[1]);
-    if(!input)
-    {
-        printf("Error reading input file\n");
-        return 1;
-    }
-
-    printf("%s\n", input);
-
-    return 0;
-}
+#endif //FILE_H
