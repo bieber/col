@@ -5,11 +5,13 @@ although not strictly adhering to it.  Currently the interpreter only supports
 file execution, a full REPL environment will come later.  To execute a file, 
 simply run
 
-col /path/to/program.col [optional command line arguments]
+col [-v] <source file> [optional command line arguments]
 
 and the interpreter will load the code in program.col and execute its main
 function.  The main function is called with any command-line arguments passed
-to it as a sequence of strings (see language reference for details).
+to it as a sequence of strings (see language reference for details).  If the -v 
+flag is passed, the interpreter will print debugging information before running 
+the program.
 
 -------------------
 LANGUAGE REFERENCE 
@@ -69,20 +71,22 @@ LANGUAGE REFERENCE
     
   An identifier is any combination of lower or uppercase letters, numbers, and 
   the symbols +, -, *, /, !, _, and -, with some caveats.  An identifier must 
-  not contain two simultaneous slashes, because // marks the rest of the line as
-  a comment, telling the reader to ignore it.  An identifier must not be of a 
-  form that could be read as a number: any text which is a valid numerical 
-  constant will be read as one, and never as an identifier.  Identifiers also 
-  cannot use the reserved words bottom, true, or false, and using the name of a
-  built-in function or functional form as an identifier will cause an error.
-  Examples of valid identifiers:
+  not be of a form that could be read as a number: any text which is a valid 
+  numerical constant will be read as one, and never as an identifier.  
+  Identifiers also cannot use the reserved words bottom, true, or false, and 
+  using the name of a built-in function or functional form as an identifier will
+  cause an error.  Examples of valid identifiers:
     my-function
     my_function
     1+
     !
-    2.2.2
+    25!
   In the interest of readability, it is advisable to avoid using identifiers 
   that might be too easily mistaken for numbers, but any combination of the 
   allowable characters that cannot be read as a number will be read as a valid 
   identifier.
-  
+
+2 - Comments
+  The # symbol marks the beginning of a comment.  The lexer will disregard any 
+  text between the # and the following newline.
+

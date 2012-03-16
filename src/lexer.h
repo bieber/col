@@ -31,6 +31,7 @@ enum token_type
     BOTTOM,      // bottom
     TRUE,        // true
     FALSE,       // false
+    IDENT,       // identifier
     OPEN_SEQ,    // <
     CLOSE_SEQ,   // >
     OPEN_SPEC,   // (
@@ -82,6 +83,8 @@ struct lexer_state
 struct lexer_state *lexer_new();
 // Initializes a lexer with a new input
 void lexer_init(struct lexer_state *state, char *input);
+// Deletes a lexer
+void lexer_delete(struct lexer_state *state);
 
 // Attempts to lex one token
 void lex(struct lexer_state *state);
