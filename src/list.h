@@ -55,4 +55,4 @@ void *list_get(struct list *list, int element);
 // Removes an item from the list
 void *list_remove(struct list *list, int element);
 
-#endif //LIST_H
+#endif // LIST_H

@@ -68,6 +68,7 @@ LANGUAGE REFERENCE
     <1, 2, 3>
     <"Sequence", "of", "strings">
     <"Nested", <"Sequence", true>>
+    <>
     
   An identifier is any combination of lower or uppercase letters, numbers, and 
   the symbols +, -, *, /, !, _, and -, with some caveats.  An identifier must 
@@ -89,4 +90,162 @@ LANGUAGE REFERENCE
 2 - Comments
   The # symbol marks the beginning of a comment.  The lexer will disregard any 
   text between the # and the following newline.
+
+3 - Data Types
+  Types are never written explicitly in a col program, but col is a strongly 
+  typed language, and primitive functions will normally only behave correctly 
+  when operating on a limited number of types.  To represent the listed types as
+  constants, see section 1.
+
+  Integers: An integer is a positive or negative whole number.  They are 
+  represented internally using C's int type, which will define the limitations 
+  on their size.
+  
+  Floating Point Numbers: Floating point numbers are represented internally 
+  using C's double type, with corresponding limitations.  When reading numeric 
+  constants, the interpreter will regard any number with a decimal point or 
+  using scientific notation as floating point.
+
+  Characters: ASCII characters, represented internally by C's char type.
+  
+  Strings: Any series of characters.  Note that strings are not equivalent to 
+  sequences of characters.
+  
+  Boolean Values: Either true or false.  Note that false is not equivalent to 
+  bottom.
+  
+  Bottom: Bottom represents an undefined value.  All functions and sequences in
+  col are bottom-preserving, meaning that any function which receives bottom as 
+  an argument will return it as a result, and any sequence containing bottom is
+  equivalent to bottom.  Bottom is commonly returned as a result of failed 
+  computation.
+  
+  Sequence: A sequence is an ordered collection of values.  The elements of a 
+  sequence may be of any type, including sequences.  The elements may also be 
+  heterogeneous.  The empty sequence must always be written "<>", there is no 
+  special symbol for it, and it is distinct from logical false and bottom.
+
+4 - Functions
+  Every function in col accepts a single argument and produces a single return 
+  value.  col functions, with the exception of I/O operations, cannot (at 
+  present) have any side-effects.  Aside from I/O, every col function will 
+  always maintain referential transparency.
+  
+  col functions are always defined in terms of other functions, combined using 
+  functional forms (defined below).  The language provides a set of primitive 
+  functions, and more complex functions may be constructed from them.
+  
+  col functions do not have type signatures.  A function may accept any value as
+  an argument, and some primitive functions may accept many possible input types
+  and return multiple corresponding output types.  If a function receives as 
+  input a value that it cannot logically handle, it will return bottom.
+  
+  Functions are normally represented simply by their identifier, but some 
+  primitive functions may also accept arguments at load-time (think of these as
+  similar to templates in C++ or generics in Java) which alter their behavior.  
+  These are called specializers, and they must be constant values.  As an 
+  example, consider the function const, which always returns the same value 
+  regardless of its input (unless its input is bottom, of course).  Because 
+  including a separate const function for every possible constant value would be
+  impractical, the const function accepts a specializer which specifies the 
+  constant that it should return.  For instance, the primitive function written
+  
+    const(15)
+    
+  will always return the value 15, regardless of its input.  At this time, only
+  primitive functions can accept specializers.
+  
+5 - Functional Forms
+  Functional forms are the tools with which functions are combined to create 
+  more complex functions.  A functional form accepts one or more functions as 
+  arguments, and creates a function that differs from the original(s) in some 
+  useful way.  Take, for instance, the compose functional form.  It accepts 
+  two or more functions and creates a new function which accepts an argument, 
+  feeds it to the last function in the argument list, feeds that function's 
+  result to the next-to-last function in the list as its argument, and so on 
+  until it reaches the first function in the list, whose argument becomes the 
+  return value of the combined function.  Consider the following function 
+  definition (more on function definitions later):
+  
+    inc-then-print = compose{ print, 1+ }
+    
+  The primitive function 1+ increments a numeric value by one, and the print 
+  function writes a value out to the screen.  The result of combining the two 
+  with the compose form is a function which first increments the value passed to
+  it and then prints the incremented value to the screen.
+  
+6 - Function Definitions
+  A program in col is written as a series of function definitions.  The 
+  interpreter reads the input file, loads the definition, and then runs the 
+  function called main (which must be present).  It passes as arguments to main
+  a sequence of strings containing the command-line arguments given to the 
+  interpreter, or the empty sequence if none were present.
+  
+  An actual function definition is written as a valid identifier followed by the
+  assignment operator, '=', followed by either the name of a function to 
+  duplicate or, more likely, a functional form combining one or more existing 
+  functions into a new, more useful function.  Functional forms may be nested, 
+  so a function definition can be as complex as necessary to achieve the 
+  desired functionality.  As an example, consider the following function 
+  definition for double, a function which accepts a numerical value and doubles 
+  it.
+  
+    double = compose{ *, construct{ id, const(2) }}
+    
+  We have already defined the compose functional form and the const primitive 
+  function.  The id primitive function simply returns its input as its output.  
+  The construct functional form accepts one or more functions and creates a 
+  function which creates a sequence from the results of applying each of its 
+  argument functions to its input.  The * primitive function accepts a sequence 
+  of numerical values and multiplies them together.
+  
+  To understand the operation of this function, consider its application to the 
+  number 3.  The compose functional form will first pass this value to its 
+  last argument, which is 
+    
+    construct{ id, const(2)}
+    
+  The construct function will in turn pass that value to each of its argument 
+  functions, and return a sequence from the results.  The id function always 
+  returns its argument, so it will return 3.  The function const(2) always 
+  returns the number 2, so it will return 2.  The construct form combines them 
+  into the sequence 
+  
+    <3, 2>
+    
+  The compose form will then take this result and pass it to its next function 
+  argument to the left, in this case *.  * accepts the sequence and multiplies 
+  its elements together, returning 6.  Because * is the first function in 
+  compose's argument list, it is returned as the result of the combined 
+  function.  The end result is that the number 3 has been doubled to yield 6.
+  
+  The arguments to functional forms can be either primitive or user-defined 
+  functions, so more complicated functions can be broken down into more simple 
+  sub-functions, and existing functions can be reused in more complicated ones.
+  Because all function definitions are loaded before executing the main 
+  function, their order in the source file is inconsequential.  If there are any
+  references to functions that don't exist, an error will be triggered at 
+  runtime.
+  
+7 - Grammar
+  What follows is the grammar of the col language in Backus-Naur Form (BNF).  
+  This should match the textual description given in section 6.  The 
+  <identifier> and <constant> nonterminals are lexed according to the 
+  descriptions given in section 1.  Comments are not included in the grammar, 
+  but discarded by the lexer before parsing.
+  
+    program ::= <function-definition> | <function-definition> <program>
+    
+    <function-definition> = <identifier> "=" <function-expression>
+    
+    <function-expression> = <identifier>
+                          | <identifier> "(" <constant-arguments> ")"
+                          | <identifier> "{" <function-arguments> "}"
+                          
+    <constant-arguments> = <constant>
+                         | <constant> "," <constant-arguments>
+                         
+    <function-arguments> = <function-expression>
+                         | <function-expression> "," <function-arguments>
+
 

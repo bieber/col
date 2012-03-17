@@ -1,7 +1,0 @@
-myfun = someform(1.5, "tes\tt"){+,/}
-test = anotherform
-{
-  ident,
-  <3, 12, '\n', 'c'>
-}
-

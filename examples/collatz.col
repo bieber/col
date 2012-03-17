@@ -1,0 +1,11 @@
+even = compose{
+  eq,
+  construct{ const(0), compose{ mod, construct{ id, const(2) }}}}
+
+collatz-step = if{ 
+  even, 
+  compose{ /, construct{ id, const(2) }},
+  compose{ 1+, compose{ *, construct{ id, const(3) }}}}
+  
+main = compose{ print, collatz-step, int }
+

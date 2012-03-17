@@ -18,10 +18,9 @@
  *
  **/
 
-#ifndef FILE_H
-#define FILE_H
+#ifndef PARSER_H
+#define PARSER_H
 
-// Reads a file into a string buffer
-char *read_file(const char *file);
 
-#endif // FILE_H
+
+#endif // PARSER_H

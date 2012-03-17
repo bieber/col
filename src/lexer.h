@@ -89,4 +89,4 @@ void lexer_delete(struct lexer_state *state);
 // Attempts to lex one token
 void lex(struct lexer_state *state);
 
-#endif //LEXER_H
+#endif // LEXER_H
