@@ -31,6 +31,7 @@ struct list_node
 struct list
 {
     int count;
+    struct list_node *cursor;
     struct list_node *front;
     struct list_node *back;
 };
@@ -54,5 +55,16 @@ void list_push_back(struct list *list, void *element);
 void *list_get(struct list *list, int element);
 // Removes an item from the list
 void *list_remove(struct list *list, int element);
+
+// Sets the cursor to the beginning of the list
+void list_cursor_begin(struct list *list);
+// Sets the cursor to the end of the list
+void list_cursor_end(struct list *list);
+// Returns the item at the cursor
+void *list_at_cursor(struct list *list);
+// Increments the cursor
+void list_next(struct list *list);
+// Decrements the cursor
+void list_prev(struct list *list);
 
 #endif // LIST_H

@@ -28,6 +28,7 @@ struct list *list_new()
     struct list *retval = (struct list*)malloc(sizeof(struct list));
     retval->front = NULL;
     retval->back = NULL;
+    retval->cursor = NULL;
     retval->count = 0;
     return retval;
 }
@@ -182,6 +183,9 @@ void *list_remove(struct list *list, int element)
             old = old->prev;
     }
 
+    if(list->cursor == old)
+        list->cursor = NULL;
+
     if(old->prev)
         old->prev->next = old->next;
     else
@@ -194,4 +198,39 @@ void *list_remove(struct list *list, int element)
 
     free(old);
     list->count--;
+}
+
+// Sets the cursor to the beginning of the list
+void list_cursor_begin(struct list *list)
+{
+    list->cursor = list->front;
+}
+
+// Sets the cursor to the end of the list
+void list_cursor_end(struct list *list)
+{
+    list->cursor = list->back;
+}
+
+// Returns the item at the cursor
+void *list_at_cursor(struct list *list)
+{
+    if(list->cursor)
+        return list->cursor->data;
+    else
+        return NULL;
+}
+
+// Increments the cursor
+void list_next(struct list *list)
+{
+    if(list->cursor)
+        list->cursor = list->cursor->next;
+}
+
+// Decrements the cursor
+void list_prev(struct list *list)
+{
+    if(list->cursor)
+        list->cursor = list->cursor->prev;
 }
