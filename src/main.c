@@ -24,20 +24,34 @@
 #include "file.h"
 #include "lexer.h"
 #include "symtable.h"
+#include "parser.h"
+#include "interpreter.h"
 
 #define USAGE "Usage: col [-v] <source file> [command-line arguments]\n"
 
 int main(int argc, char *argv[])
 {
+    int verbose = 0;
     char *input;
-    struct lexer_state *lexer;
+    struct lexer_state *lexer = NULL;
+    struct symtable *symtable = NULL;
     
+    // Checking presence of command-line arguments
     if(argc < 2)
     {
-        printf("Usage: col <source file> [command-line arguments]\n");
+        printf(USAGE);
         return 1;
     }
+    
+    // Checking for verbose flag
+    if(!strcmp(argv[1], "-v") || !strcmp(argv[1], "-V"))
+    {
+        verbose = 1;
+        argc--;
+        argv++;
+    }
 
+    // Reading the input file
     input = read_file(argv[1]);
     if(!input)
     {
@@ -45,21 +59,17 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    // Initializing the lexer
     lexer = lexer_new();
     lexer_init(lexer, input);
 
-    // Testing the symtable code
-    struct symtable *table = symtable_new();
-
-    symtable_add(table, "test1", (void*)1);
-    symtable_add(table, "test2", (void*)2);
-    symtable_add(table, "collatz24", (void*)24);
-
-    printf("%p\n%p\n%p\n%p\n",
-           symtable_find(table, "test1"),
-           symtable_find(table, "test2"),
-           symtable_find(table, "collatz24"),
-           symtable_find(table, "notthere"));
-
+    // Feeding the input to the parser and getting the symtable
+    symtable = parse(lexer);
+    
+    // Cleaning up
+    free(input);
+    lexer_delete(lexer);
+    symtable_delete(symtable);
+    
     return 0;
 }

@@ -46,6 +46,9 @@ struct symtable *symtable_delete(struct symtable *table)
     struct list *list = NULL;
     struct symtable_entry *entry = NULL;
 
+    if(!table)
+        return;
+
     for(i = 0; i < SYMTABLE_SIZE; i++)
     {
         for(list_cursor_begin(list); list->cursor; list_next(list))

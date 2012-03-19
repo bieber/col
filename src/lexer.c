@@ -68,6 +68,9 @@ void lexer_init(struct lexer_state *state, char *input)
 // Deletes a lexer
 void lexer_delete(struct lexer_state *state)
 {
+    if(!state)
+        return;
+
     if(state->type == IDENT || state->type == STRING)
         free(state->value.sval);
     free(state);

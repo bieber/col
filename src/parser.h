@@ -21,6 +21,10 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+struct symtable;
+struct lexer_state;
 
+// Parses the output of a lexer, builds a symtable and returns it
+struct symtable *parse(struct lexer_state *lexer);
 
 #endif // PARSER_H

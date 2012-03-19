@@ -37,6 +37,10 @@ void list_delete(struct list *list)
 {
     struct list_node *current = list->front;
     struct list_node *next = NULL;
+    
+    if(!list)
+        return;
+
     while(current)
     {
         next = current->next;

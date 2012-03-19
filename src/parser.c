@@ -18,5 +18,15 @@
  *
  **/
 
-#include "parser.h"
+#include <stdlib.h>
 
+#include "parser.h"
+#include "interpreter.h"
+#include "symtable.h"
+#include "lexer.h"
+
+// Parses the output of a lexer, builds a symtable and returns it
+struct symtable *parse(struct lexer_state *lexer)
+{
+    return NULL;
+}
