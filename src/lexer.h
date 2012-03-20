@@ -63,6 +63,10 @@ struct lexer_state
     int line;
     int col;
 
+    // Position of last token
+    int token_line;
+    int token_col;
+
     // Current location in string
     char *cursor;
 

@@ -45,6 +45,8 @@ struct lexer_state *lexer_new()
 
     retval->line = 0;
     retval->col = 0;
+    retval->token_line = 0;
+    retval->token_line = 0;
     retval->cursor = NULL;
     retval->type = NONE;
     retval->value.sval = NULL;
@@ -57,7 +59,7 @@ struct lexer_state *lexer_new()
 // Initializes a lexer with a new input
 void lexer_init(struct lexer_state *state, char *input)
 {
-    state->line = state->col = 1;
+    state->line = state->col = state->token_line = state->token_col = 1;
     state->cursor = input;
     state->type = NONE;
     state->value.sval = NULL;
@@ -103,6 +105,10 @@ void lex(struct lexer_state *state)
         state->type = NONE;
         return;
     }
+
+    // Marking start location of this token
+    state->token_line = state->line;
+    state->token_col = state->col;
 
     // Checking for single-character tokens
     if(is_single_char_token(*(state->cursor)))
