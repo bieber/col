@@ -230,22 +230,25 @@ LANGUAGE REFERENCE
 7 - Grammar
   What follows is the grammar of the col language in Backus-Naur Form (BNF).  
   This should match the textual description given in section 6.  The 
-  <identifier> and <constant> nonterminals are lexed according to the 
+  <identifier> and <value> nonterminals are lexed according to the 
   descriptions given in section 1.  Comments are not included in the grammar, 
   but discarded by the lexer before parsing.
   
-    program ::= <function-definition> | <function-definition> <program>
+    program ::= <function-definition> 
+              | <function-definition> <program>
     
-    <function-definition> = <identifier> "=" <function-expression>
+    <function-definition> ::= <identifier> "=" <function-expression>
     
-    <function-expression> = <identifier>
-                          | <identifier> "(" <constant-arguments> ")"
-                          | <identifier> "{" <function-arguments> "}"
+    <function-expression> ::= <identifier>
+                            | <identifier> "(" <constant-arguments> ")"
+                            | <identifier> "{" <function-arguments> "}"
                           
-    <constant-arguments> = <constant>
-                         | <constant> "," <constant-arguments>
+    <constant-arguments> ::= <constant>
+                           | <constant> "," <constant-arguments>
                          
-    <function-arguments> = <function-expression>
-                         | <function-expression> "," <function-arguments>
+    <function-arguments> ::= <function-expression>
+                           | <function-expression> "," <function-arguments>
 
+    <constant> ::= <value>
+                 | "<" <constant-arguments> ">"
 
