@@ -24,6 +24,7 @@
 #define SYMTABLE_SIZE 1024
 
 struct list;
+struct function;
 
 // symtables are stored as hash-tables with linked-list chaining for collisions
 struct symtable
@@ -35,7 +36,7 @@ struct symtable
 struct symtable_entry
 {
     char *name;
-    void *data;
+    struct function *data;
 };
 
 // Creates a new symtable
@@ -44,9 +45,9 @@ struct symtable *symtable_new();
 struct symtable *symtable_delete();
 
 // Adds an entry to the table
-void symtable_add(struct symtable *table, char *name, void *data);
+void symtable_add(struct symtable *table, char *name, struct function *data);
 // Retrieves an entry from the table
-void *symtable_find(struct symtable *table, char *name);
+struct function *symtable_find(struct symtable *table, char *name);
 // Removes an entry from the table
 void symtable_remove(struct symtable *table, char *name);
 

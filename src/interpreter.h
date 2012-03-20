@@ -23,6 +23,12 @@
 
 struct list;
 
+// List of primitive functions
+extern char *PRIMITIVE_FUNCTIONS[];
+// List of functional forms
+extern char *FUNCTIONAL_FORMS[];
+
+// Data types
 enum value_type
 {
     INT_VAL,    // Integer
@@ -34,6 +40,7 @@ enum value_type
     SEQ_VAL     // Sequence
 };
 
+// Types of function
 enum function_type
 {
     PRIMITIVE, // Primitive function
@@ -41,6 +48,7 @@ enum function_type
     FORM       // Functional form
 };
 
+// The type and content of a value
 struct value
 {
     // Data type
@@ -55,9 +63,10 @@ struct value
         char char_val;
         char *str_val;
         struct list *seq_val;
-    } value;
+    } data;
 };
 
+// Representation of a function definition of any type
 struct function
 {
     // Function or form identifier
@@ -71,5 +80,15 @@ struct function
     int line;
     int col;
 };
+
+// Creates an empty function struct
+struct function *function_new();
+// Deletes a function struct
+void function_delete(struct function *function);
+
+// Creates an empty value struct
+struct value *value_new();
+// Deletes a value struct
+void value_delete(struct value *value);
 
 #endif // INTERPRETER_H

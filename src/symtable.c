@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "symtable.h"
+#include "interpreter.h"
 #include "list.h"
 
 unsigned int hash(char *s);
@@ -51,10 +52,12 @@ struct symtable *symtable_delete(struct symtable *table)
 
     for(i = 0; i < SYMTABLE_SIZE; i++)
     {
+        list = table->entries[i];
         for(list_cursor_begin(list); list->cursor; list_next(list))
         {
             entry = list_at_cursor(list);
             free(entry->name);
+            function_delete(entry->data);
             free(entry);
         }
         list_delete(list);
@@ -64,7 +67,7 @@ struct symtable *symtable_delete(struct symtable *table)
 }
 
 // Adds an entry to the table
-void symtable_add(struct symtable *table, char *name, void *data)
+void symtable_add(struct symtable *table, char *name, struct function *data)
 {
     struct symtable_entry *entry = 
         (struct symtable_entry*)malloc(sizeof(struct symtable_entry));
@@ -76,7 +79,7 @@ void symtable_add(struct symtable *table, char *name, void *data)
 }
 
 // Retrieves an entry from the table
-void *symtable_find(struct symtable *table, char *name)
+struct function *symtable_find(struct symtable *table, char *name)
 {
     struct list *list = table->entries[hash(name) % table->size];
     struct symtable_entry *entry = NULL;

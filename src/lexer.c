@@ -47,6 +47,7 @@ struct lexer_state *lexer_new()
     retval->col = 0;
     retval->token_line = 0;
     retval->token_line = 0;
+    retval->token_cursor = 0;
     retval->cursor = NULL;
     retval->type = NONE;
     retval->value.sval = NULL;
@@ -61,6 +62,7 @@ void lexer_init(struct lexer_state *state, char *input)
 {
     state->line = state->col = state->token_line = state->token_col = 1;
     state->cursor = input;
+    state->token_cursor = input;
     state->type = NONE;
     state->value.sval = NULL;
     state->error = OK;
@@ -109,6 +111,7 @@ void lex(struct lexer_state *state)
     // Marking start location of this token
     state->token_line = state->line;
     state->token_col = state->col;
+    state->token_cursor = state->cursor;
 
     // Checking for single-character tokens
     if(is_single_char_token(*(state->cursor)))
@@ -194,6 +197,19 @@ void lex(struct lexer_state *state)
     // If nothing at all matches, error out...
     state->type = NONE;
     state->error = UNRECOGNIZED_TOKEN;
+}
+
+// Rewinds so that the previous token will be lexed again (works only once)
+void lexer_rewind(struct lexer_state *state)
+{
+    // Only works when last token was successfully lexed
+    if(state->error != OK)
+        return;
+
+    state->cursor = state->token_cursor;
+    state->line = state->token_line;
+    state->col = state->token_col;
+    state->type = NONE;
 }
 
 void skip_whitespace(struct lexer_state *state)

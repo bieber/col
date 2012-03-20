@@ -66,6 +66,7 @@ struct lexer_state
     // Position of last token
     int token_line;
     int token_col;
+    char *token_cursor;
 
     // Current location in string
     char *cursor;
@@ -92,5 +93,7 @@ void lexer_delete(struct lexer_state *state);
 
 // Attempts to lex one token
 void lex(struct lexer_state *state);
+// Rewinds so that the previous token will be lexed again (works only once)
+void lexer_rewind(struct lexer_state *state);
 
 #endif // LEXER_H
