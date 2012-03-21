@@ -34,6 +34,7 @@ char *PRIMITIVE_FUNCTIONS[] =
     "/",
     "1+",
     "*",
+    "int",
     ""
 };
 
@@ -72,7 +73,7 @@ void function_delete(struct function *function)
         list_delete(l);
     }
     
-    if(function->type == FORM)
+    if(function->type == FORM && function->args)
     {
         l = function->args;
         for(list_cursor_begin(l); l->cursor; list_next(l))
@@ -102,6 +103,10 @@ void value_delete(struct value *value)
         for(list_cursor_begin(l); l->cursor; list_next(l))
             value_delete((struct value*)list_at_cursor(l));
         list_delete(value->data.seq_val);
+    }
+    else if(value->type == STRING_VAL)
+    {
+        free(value->data.str_val);
     }
 
     free(value);

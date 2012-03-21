@@ -26,6 +26,7 @@
 #include "interpreter.h"
 #include "symtable.h"
 #include "lexer.h"
+#include "list.h"
 
 // Possible errors
 enum parser_error
@@ -33,13 +34,29 @@ enum parser_error
     LEX_ERROR,
     EXPECTED_IDENT,
     EXPECTED_ASSIGN,
-    UNEXPECTED_END
+    EXPECTED_ARGS,
+    EXPECTED_CLOSE,
+    EXPECTED_CONST,
+    UNEXPECTED_END,
+    INVALID_ELEMENT
 };
 
-// Requires a token, returns 1 on success, 0 on failure, -1 on error
+// Requires a token
 int require_token(struct lexer_state *lexer, enum token_type token);
 // Parses a function definition
 struct function *parse_function(struct lexer_state *lexer);
+// Parses a set of constant arguments
+struct list *parse_constant_args(struct lexer_state *lexer,
+                                 enum token_type close);
+// Parses a set of function arguments
+struct list *parse_function_args(struct lexer_state *lexer);
+// Parses a constant
+struct value *parse_constant(struct lexer_state *lexer);
+
+// Deletes every value in a list
+void clear_value_list(struct list *args);
+// Deletes every function in a list
+void clear_function_list(struct list *args);
 
 // Prints an error message
 void print_error(struct lexer_state *lexer, enum parser_error error);
@@ -83,8 +100,6 @@ struct symtable *parse(struct lexer_state *lexer)
         // Otherwise, grab the name
         ident = strdup(lexer->value.sval);
 
-        printf("Defining %s\n", ident); ///REMOVE
-
         // Require the assign operator
         if(!require_token(lexer, ASSIGN))
         {
@@ -118,7 +133,7 @@ struct symtable *parse(struct lexer_state *lexer)
     return table;
 }
 
-// Requires a token, returns 1 on success, 0 on failure, -1 on error
+// Requires a token
 int require_token(struct lexer_state *lexer, enum token_type token)
 {
     if(lexer->error != OK)
@@ -129,7 +144,7 @@ int require_token(struct lexer_state *lexer, enum token_type token)
     if(lexer->error == UNRECOGNIZED_TOKEN)
     {
         print_error(lexer, LEX_ERROR);
-        return -1;
+        return 0;
     }
 
     if(lexer->type != token)
@@ -181,25 +196,251 @@ struct function *parse_function(struct lexer_state *lexer)
         if(!strcmp(*name_check, function->name))
             function->type = FORM;
 
-    ///REMOVE ALL THIS
-    switch(function->type)
+    // Now checking for possible arguments
+    if(function->type == PRIMITIVE)
     {
-    case USER:
-        printf("Found user function %s\n", function->name);
+        lex(lexer);
+        
+        if(lexer->error == UNRECOGNIZED_TOKEN)
+        {
+            print_error(lexer, LEX_ERROR);
+            function_delete(function);
+            return NULL;
+        }
+
+        // Now checking for opening paren
+        if(lexer->error == OK && lexer->type == OPEN_SPEC)
+        {
+            function->args = parse_constant_args(lexer, CLOSE_SPEC);
+            if(!function->args)
+            {
+                function_delete(function);
+                return NULL;
+            }
+        }
+        else
+        {
+            lexer_rewind(lexer);
+        }
+    }
+    else if(function->type == FORM)
+    {
+        // A functional form requires arguments
+        if(!require_token(lexer, OPEN_FORM))
+        {
+            print_error(lexer, EXPECTED_ARGS);
+            function_delete(function);
+            return NULL;
+        }
+
+        function->args = parse_function_args(lexer);
+        if(!function->args)
+        {
+            function_delete(function);
+            return NULL;
+        }
+    }
+    
+    return function;
+}
+
+// Parses a set of constant arguments
+struct list *parse_constant_args(struct lexer_state *lexer, 
+                                 enum token_type close)
+{
+    struct value *arg = NULL;
+    struct list *args = list_new();
+    
+    while(lexer->error == OK)
+    {
+
+        // First parse a value and add it to the list
+        arg = parse_constant(lexer);
+
+        if(!arg)
+        {
+            clear_function_list(args);
+            return NULL;
+        }
+
+        list_push_back(args, arg);
+
+        // Now checking for a separator or end of the list
+        lex(lexer);
+
+        if(lexer->error == UNRECOGNIZED_TOKEN)
+        {
+            print_error(lexer, LEX_ERROR);
+            clear_value_list(args);
+            return NULL;
+        }
+
+        if(lexer->error == END_OF_INPUT)
+        {
+            print_error(lexer, UNEXPECTED_END);
+            clear_value_list(args);
+            return NULL;
+        }
+
+        if(lexer->type == close)
+            break;
+
+        // If the list is still open, we expect a separator
+        if(lexer->type != SEPARATOR)
+        {
+            print_error(lexer, INVALID_ELEMENT);
+            clear_value_list(args);
+            return NULL;
+        }
+    }
+
+    return args;
+}
+// Parses a set of function arguments
+struct list *parse_function_args(struct lexer_state *lexer)
+{
+    struct function *arg = NULL;
+    struct list *args = list_new();
+
+    while(lexer->error == OK)
+    {
+        // First parse a function and add it to the list
+        arg = parse_function(lexer);
+
+        if(!arg)
+        {
+            clear_function_list(args);
+            return NULL;
+        }
+
+        list_push_back(args, arg);
+
+        // Then look for either a separator or a close 
+        lex(lexer);
+
+        if(lexer->error == UNRECOGNIZED_TOKEN)
+        {
+            print_error(lexer, LEX_ERROR);
+            clear_function_list(args);
+            return NULL;
+        }
+
+        if(lexer->error == END_OF_INPUT)
+        {
+            print_error(lexer, UNEXPECTED_END);
+            clear_function_list(args);
+            return NULL;
+        }
+
+        if(lexer->type == CLOSE_FORM)
+            break;
+
+        // If there hasn't been a close, then it better be a separator
+        if(lexer->type != SEPARATOR)
+        {
+            print_error(lexer, INVALID_ELEMENT);
+            clear_function_list(args);
+            return NULL;
+        }
+    }
+
+    return args;
+}
+
+// Parses a constant
+struct value *parse_constant(struct lexer_state *lexer)
+{
+    struct value *arg = value_new();
+    
+    // First grab the next token
+    lex(lexer);
+
+    if(lexer->error == END_OF_INPUT)
+    {
+        print_error(lexer, UNEXPECTED_END);
+        value_delete(arg);
+        return NULL;
+    }
+
+    if(lexer->error == UNRECOGNIZED_TOKEN)
+    {
+        print_error(lexer, LEX_ERROR);
+        value_delete(arg);
+        return NULL;
+    }
+
+    switch(lexer->type)
+    {
+        
+    case BOTTOM:
+        arg->type = BOTTOM_VAL;
+        break;
+
+    case INT:
+        arg->type = INT_VAL;
+        arg->data.int_val = lexer->value.ival;
+        break;
+
+    case FLOAT:
+        arg->type = FLOAT_VAL;
+        arg->data.float_val = lexer->value.fval;
+        break;
+
+    case TRUE:
+        arg->type = BOOL_VAL;
+        arg->data.bool_val = 1;
+        break;
+
+    case FALSE:
+        arg->type = BOOL_VAL;
+        arg->data.bool_val = 0;
+        break;
+
+    case CHAR:
+        arg->type = CHAR_VAL;
+        arg->data.char_val = lexer->value.cval;
+        break;
+
+    case STRING:
+        arg->type = STRING_VAL;
+        arg->data.str_val = strdup(lexer->value.sval);
         break;
         
-    case PRIMITIVE:
-        printf("Found primitive function %s\n", function->name);
+    case OPEN_SEQ:
+        arg->type = SEQ_VAL;
+        arg->data.seq_val = parse_constant_args(lexer, CLOSE_SEQ);
+        if(!arg->data.seq_val)
+        {
+            value_delete(arg);
+            return NULL;
+        }
         break;
 
-    case FORM:
-        printf("Found functional form %s\n", function->name);
-        break;
+    default:
+        print_error(lexer, EXPECTED_CONST);
+        value_delete(arg);
+        return NULL;
     }
-    ///TO HERE
 
+    return arg;
+}
 
-    return NULL;
+// Deletes every value in a list
+void clear_value_list(struct list *args)
+{
+    for(list_cursor_begin(args); args->cursor; list_next(args))
+        if(list_at_cursor(args))
+            value_delete(list_at_cursor(args));
+    list_delete(args);
+}
+
+// Deletes every function in a list
+void clear_function_list(struct list *args)
+{
+    for(list_cursor_begin(args); args->cursor; list_next(args))
+        if(list_at_cursor(args))
+            function_delete(list_at_cursor(args));
+    list_delete(args);
 }
 
 // Prints an error message
@@ -221,8 +462,23 @@ void print_error(struct lexer_state *lexer, enum parser_error error)
                lexer->token_line, lexer->token_col);
         break;
 
+    case EXPECTED_ARGS:
+        printf("Error: Expected function arguments at %d, %d\n",
+               lexer->token_line, lexer->token_col);
+        break;
+
+    case EXPECTED_CONST:
+        printf("Error: Expected constant at %d, %d\n",
+               lexer->token_line, lexer->token_col);
+        break;
+
     case UNEXPECTED_END:
         printf("Error: Unexpected end of file\n");
+        break;
+
+    case INVALID_ELEMENT:
+        printf("Error: Invalid list element at %d, %d\n",
+               lexer->token_line, lexer->token_col);
         break;
     }
 }
