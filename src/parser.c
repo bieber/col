@@ -251,9 +251,31 @@ struct list *parse_constant_args(struct lexer_state *lexer,
     struct value *arg = NULL;
     struct list *args = list_new();
     
-    while(lexer->error == OK)
+    // First check for empty list
+    lex(lexer);
+    
+    if(lexer->error == UNRECOGNIZED_TOKEN)
     {
+        print_error(lexer, LEX_ERROR);
+        clear_value_list(args);
+        return NULL;
+    }
+    
+    if(lexer->error == END_OF_INPUT)
+    {
+        print_error(lexer, UNEXPECTED_END);
+        clear_value_list(args);
+        return NULL;
+    }
 
+    // If we already have close token, just return empty list
+    if(lexer->type == close)
+        return args;
+    else
+        lexer_rewind(lexer);
+
+    while(lexer->error == OK)
+    {        
         // First parse a value and add it to the list
         arg = parse_constant(lexer);
 
