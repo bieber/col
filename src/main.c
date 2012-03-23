@@ -51,6 +51,9 @@ int main(int argc, char *argv[])
         argv++;
     }
 
+    if(verbose)
+        printf("Reading input file...\n");
+
     // Reading the input file
     input = read_file(argv[1]);
     if(!input)
@@ -59,6 +62,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    if(verbose)
+        printf("Parsing function definitions...\n");
+
     // Initializing the lexer
     lexer = lexer_new();
     lexer_init(lexer, input);
@@ -66,6 +72,19 @@ int main(int argc, char *argv[])
     // Feeding the input to the parser and getting the symtable
     symtable = parse(lexer);
     
+    if(!symtable)
+    {
+        free(input);
+        lexer_delete(lexer);
+        return 1;
+    }
+
+    if(verbose)
+    {
+        printf("Loaded function definitions:\n\n");
+        symtable_print(symtable);
+    }
+
     // Cleaning up
     free(input);
     lexer_delete(lexer);

@@ -21,6 +21,9 @@
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
 
+#define INDENT_STEP 2 // Number of spaces to indent each level for debug
+
+struct symtable;
 struct list;
 
 // List of primitive functions
@@ -90,5 +93,12 @@ void function_delete(struct function *function);
 struct value *value_new();
 // Deletes a value struct
 void value_delete(struct value *value);
+
+// Prints a text representation of a function
+void function_print(struct function *function, int level);
+// Prints a text representation of a value
+void value_print(struct value *value, int level);
+// Prints a text representation of all the functions in a symtable
+void symtable_print(struct symtable *table);
 
 #endif // INTERPRETER_H

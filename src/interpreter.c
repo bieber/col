@@ -18,10 +18,12 @@
  *
  **/
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "interpreter.h"
 #include "list.h"
+#include "symtable.h"
 
 // List of primitive functions, empty string at end marks end of list
 // Currently far from complete, just sufficient for parsing example
@@ -110,4 +112,128 @@ void value_delete(struct value *value)
     }
 
     free(value);
+}
+
+// Prints a text representation of a function
+void function_print(struct function *function, int level)
+{
+    int i;
+    struct list *l;
+
+    for(i = 0; i < level; i++)
+        printf(" ");
+
+    switch(function->type)
+    {
+    case PRIMITIVE:
+        printf("%s (Primitive)\n", function->name);
+        
+        if(function->args)
+        {
+            l = function->args;
+
+            for(i = 0; i < level; i++)
+                printf(" ");
+
+            printf("Arguments:\n");
+            for(list_cursor_begin(l); l->cursor; list_next(l))
+                value_print((struct value*)list_at_cursor(l),
+                            level + INDENT_STEP);
+        }
+
+        break;
+        
+    case FORM:
+        printf("%s (Functional Form)\n", function->name);
+
+        if(function->args)
+        {
+            l = function->args;
+
+            for(i = 0; i < level; i++)
+                printf(" ");
+
+            printf("Arguments:\n");
+            for(list_cursor_begin(l); l->cursor; list_next(l))
+                function_print((struct function*)list_at_cursor(l),
+                               level + INDENT_STEP);
+        }
+
+        break;
+
+    case USER:
+        printf("%s (User Defined)\n", function->name);
+        break;
+    }
+}
+
+// Prints a text representation of a value
+void value_print(struct value *value, int level)
+{
+    int i;
+    struct list *l;
+
+    for(i = 0; i < level; i++)
+        printf(" ");
+
+    switch(value->type)
+    {
+    case INT_VAL:
+        printf("%d (Integer)\n", value->data.int_val);
+        break;
+
+    case FLOAT_VAL:
+        printf("%lf (Floating Point)\n", value->data.float_val);
+        break;
+        
+    case CHAR_VAL:
+        printf("'%c' (Character)\n", value->data.char_val);
+        break;
+
+    case STRING_VAL:
+        printf("\"%s\" (String)\n", value->data.str_val);
+        break;
+
+    case BOOL_VAL:
+        if(value->data.bool_val)
+            printf("True (Boolean)\n");
+        else
+            printf("False (Boolean)\n");
+        break;
+
+    case BOTTOM_VAL:
+        printf("Bottom\n");
+        break;
+
+    case SEQ_VAL:
+        printf("Sequence:\n");
+        
+        l = value->data.seq_val;
+        for(list_cursor_begin(l); l->cursor; list_next(l))
+            value_print((struct value*)list_at_cursor(l), level + INDENT_STEP);
+        break;
+    }
+}
+
+// Prints a text representation of all the functions in a symtable
+void symtable_print(struct symtable *table)
+{
+    int i = 0;
+    struct list *l;
+    struct symtable_entry *e = NULL;
+
+    // Just iterating through the symtable and printing each entry
+    // Not in any particular order, thanks to the hashing
+    for(i = 0; i < SYMTABLE_SIZE; i++)
+    {
+        l = table->entries[i];
+        for(list_cursor_begin(l); l->cursor; list_next(l))
+        {
+            e = list_at_cursor(l);
+            
+            printf("%s = \n", e->name);
+            function_print(e->data, 0);
+            printf("\n");
+        }
+    }
 }
