@@ -189,10 +189,10 @@ struct function *parse_function(struct lexer_state *lexer)
     function->type = USER; // Until proven otherwise
 
     // Checking against primitive and form lists
-    for(name_check = PRIMITIVE_FUNCTIONS; **name_check; name_check++)
+    for(name_check = PRIMITIVE_FUNCTION_NAMES; **name_check; name_check++)
         if(!strcmp(*name_check, function->name))
             function->type = PRIMITIVE;
-    for(name_check = FUNCTIONAL_FORMS; **name_check; name_check++)
+    for(name_check = FUNCTIONAL_FORM_NAMES; **name_check; name_check++)
         if(!strcmp(*name_check, function->name))
             function->type = FORM;
 

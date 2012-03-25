@@ -24,30 +24,31 @@
 #include "interpreter.h"
 #include "list.h"
 #include "symtable.h"
+#include "primitives.h"
+#include "forms.h"
 
 // List of primitive functions, empty string at end marks end of list
-// Currently far from complete, just sufficient for parsing example
-char *PRIMITIVE_FUNCTIONS[] = 
+char *PRIMITIVE_FUNCTION_NAMES[] = 
 {
-    "const",
-    "id",
-    "eq",
-    "mod",
-    "/",
-    "1+",
-    "*",
-    "int",
-    ""
+    #include "gen/primitive_names.h"
 };
 
-// List of primitive functions, empty string at end marks end of list
-// Currently far from complete, just sufficient for parsing example
-char *FUNCTIONAL_FORMS[] = 
+// List of functional forms, empty string at end marks end of list
+char *FUNCTIONAL_FORM_NAMES[] = 
 {
-    "compose",
-    "construct",
-    "if",
-    ""
+    #include "gen/form_names.h"
+};
+
+// List of primitive function pointers
+struct value*(*PRIMITIVE_FUNCTIONS[])(struct value*) = 
+{
+    #include "gen/primitive_defs.h"
+};
+
+// List of functional form definitions
+struct value*(*FUNCTIONAL_FORMS[])(struct list*, struct value*) =
+{
+    #include "gen/form_defs.h"
 };
 
 // Creates an empty function struct

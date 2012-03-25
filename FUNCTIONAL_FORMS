@@ -1,0 +1,6 @@
+compose:
+* Function composition.  Feeds its input to the last function in its argument
+* list, then feeds that function's output to the second-to-last, and so on,
+* eventually returning the output of the last function in the list as the 
+* combined function's output.
+

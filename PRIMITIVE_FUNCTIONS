@@ -1,0 +1,26 @@
+*:
+* Basic multiplication function.
+* Input - A sequence of numbers, integer or floating point.
+* Output - The product of the input numbers, floating point if any of the 
+* inputs were floating point.
+
++:
+* Basic addition function.
+* Input - A sequence of numbers, integer or floating point.
+* Output - The sum of the input numbers, floating point if any of the input 
+* numbers was floating point, integer otherwise.
+
+-:
+* Basic subtraction function.
+* Input - A sequence of numbers, integer or floating point.
+* Output - The difference of each of the numbers, starting with the first 
+* value and subtracting each successive value in order.  Result is floating 
+* point if any of the input numbers are floating point.
+
+/:
+* Basic division function.
+* Input - A sequence of numbers, integer or floating point.
+* Output - The quotient of each of the numbers, starting with the first 
+* value and subtracting each successive value in order.  Result is a floating 
+* point number.
+

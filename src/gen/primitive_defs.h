@@ -1,0 +1,4 @@
+multiply,
+add,
+subtract,
+divide

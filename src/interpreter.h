@@ -27,9 +27,11 @@ struct symtable;
 struct list;
 
 // List of primitive functions
-extern char *PRIMITIVE_FUNCTIONS[];
+extern char *PRIMITIVE_FUNCTION_NAMES[];
+extern struct value*(*PRIMITIVE_FUNCTIONS[])(struct value*);
 // List of functional forms
-extern char *FUNCTIONAL_FORMS[];
+extern char *FUNCTIONAL_FORM_NAMES[];
+extern struct value*(*FUNCTIONAL_FORMS[])(struct list*, struct value*);
 
 // Data types
 enum value_type
