@@ -28,10 +28,13 @@ struct list;
 
 // List of primitive functions
 extern char *PRIMITIVE_FUNCTION_NAMES[];
-extern struct value*(*PRIMITIVE_FUNCTIONS[])(struct value*);
+extern struct value*(*PRIMITIVE_FUNCTIONS[])(struct list*, struct value*);
 // List of functional forms
 extern char *FUNCTIONAL_FORM_NAMES[];
 extern struct value*(*FUNCTIONAL_FORMS[])(struct list*, struct value*);
+
+// Global symtable
+extern struct symtable *SYMTABLE;
 
 // Data types
 enum value_type
@@ -80,6 +83,8 @@ struct function
     enum function_type type;
     // List of arguments, either form arguments or primitive specializers
     struct list *args;
+    // Index into function/name array if primitive or functional form
+    int index;
 
     // Location in source file
     int line;
@@ -102,5 +107,8 @@ void function_print(struct function *function, int level);
 void value_print(struct value *value, int level);
 // Prints a text representation of all the functions in a symtable
 void symtable_print(struct symtable *table);
+
+// Executes a function, always returns a new value object
+struct value *function_exec(struct function *function, struct value *in);
 
 #endif // INTERPRETER_H

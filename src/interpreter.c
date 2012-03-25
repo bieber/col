@@ -27,6 +27,9 @@
 #include "primitives.h"
 #include "forms.h"
 
+// Global symtable is initially NULL, initialized in main.c
+struct symtable *SYMTABLE = NULL;
+
 // List of primitive functions, empty string at end marks end of list
 char *PRIMITIVE_FUNCTION_NAMES[] = 
 {
@@ -40,7 +43,7 @@ char *FUNCTIONAL_FORM_NAMES[] =
 };
 
 // List of primitive function pointers
-struct value*(*PRIMITIVE_FUNCTIONS[])(struct value*) = 
+struct value*(*PRIMITIVE_FUNCTIONS[])(struct list*, struct value*) = 
 {
     #include "gen/primitive_defs.h"
 };
@@ -56,6 +59,7 @@ struct function *function_new()
 {
     struct function *retval =
         (struct function*)malloc(sizeof(struct function));
+    retval->index = 0;
     retval->name = NULL;
     retval->args = NULL;
     return retval;
@@ -213,6 +217,10 @@ void value_print(struct value *value, int level)
         for(list_cursor_begin(l); l->cursor; list_next(l))
             value_print((struct value*)list_at_cursor(l), level + INDENT_STEP);
         break;
+
+    default:
+        printf("Unknown value type %d\n", value->type);
+        break;
     }
 }
 
@@ -236,5 +244,45 @@ void symtable_print(struct symtable *table)
             function_print(e->data, 0);
             printf("\n");
         }
+    }
+}
+
+// Executes a function, always returns a new value object
+struct value *function_exec(struct function *function, struct value *in)
+{
+    struct value *out = NULL;
+
+    switch(function->type)
+    {
+    case USER:
+        // For user functions, just look up the function in the symtable and 
+        // execute it, or return bottom if it's not found
+        function = symtable_find(SYMTABLE, function->name);
+        if(function)
+        {
+            return function_exec(function,  in);
+        }
+        else
+        {
+            out = value_new();
+            out->type = BOTTOM_VAL;
+            value_delete(in);
+            return out;
+        }   
+        break;
+
+    case FORM:
+        // For functional forms, get the apropriate function pointer from the 
+        // table and pass it the input
+        out = (*FUNCTIONAL_FORMS[function->index])(function->args, in);
+        //value_delete(in);
+        return out;
+
+    case PRIMITIVE:
+        // For primitive functions, get the function pointer from the table, 
+        // pass it the input, return result
+        out = (*PRIMITIVE_FUNCTIONS[function->index])(function->args, in);
+        //value_delete(in);
+        return out;
     }
 }

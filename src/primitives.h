@@ -38,7 +38,7 @@ struct value;
  * Output - The sum of the input numbers, floating point if any of the input 
  * numbers was floating point, integer otherwise.
  */
-struct value *add(struct value *in);
+struct value *add(struct list *args, struct value *in);
 
 /*** -
  * Basic subtraction function.
@@ -47,7 +47,7 @@ struct value *add(struct value *in);
  * value and subtracting each successive value in order.  Result is floating 
  * point if any of the input numbers are floating point.
  */
-struct value *subtract(struct value *in);
+struct value *subtract(struct list *args, struct value *in);
 
 /*** *
  * Basic multiplication function.
@@ -55,7 +55,7 @@ struct value *subtract(struct value *in);
  * Output - The product of the input numbers, floating point if any of the 
  * inputs were floating point.
  */
-struct value *multiply(struct value *in);
+struct value *multiply(struct list *args, struct value *in);
 
 /*** /
  * Basic division function.
@@ -64,7 +64,14 @@ struct value *multiply(struct value *in);
  * value and subtracting each successive value in order.  Result is a floating 
  * point number.
  */
-struct value *divide(struct value *in);
+struct value *divide(struct list *args, struct value *in);
 
+/*** const
+ * Constant function.
+ * Specializers - const(n)
+ * Input - Any value other than bottom.
+ * Output - The value n.
+ */
+struct value *constant(struct list *args, struct value *in);
 
 #endif // PRIMITIVES_H

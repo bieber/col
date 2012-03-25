@@ -34,7 +34,8 @@ int main(int argc, char *argv[])
     int verbose = 0;
     char *input;
     struct lexer_state *lexer = NULL;
-    struct symtable *symtable = NULL;
+    struct value *args = NULL;
+    struct value *final = NULL;
     
     // Checking presence of command-line arguments
     if(argc < 2)
@@ -70,9 +71,9 @@ int main(int argc, char *argv[])
     lexer_init(lexer, input);
 
     // Feeding the input to the parser and getting the symtable
-    symtable = parse(lexer);
+    SYMTABLE = parse(lexer);
     
-    if(!symtable)
+    if(!SYMTABLE)
     {
         free(input);
         lexer_delete(lexer);
@@ -82,13 +83,25 @@ int main(int argc, char *argv[])
     if(verbose)
     {
         printf("Loaded function definitions:\n\n");
-        symtable_print(symtable);
+        symtable_print(SYMTABLE);
+    }
+
+    // Running the main function
+    args = value_new(); ///TODO: Actually fill in the command-line args here
+    args->type = INT_VAL;
+    args->data.int_val = 5;
+    final = function_exec(symtable_find(SYMTABLE, "main"), args);
+    
+    if(verbose)
+    {
+        printf("Return value of main:\n");
+        value_print(final, 0);
     }
 
     // Cleaning up
     free(input);
     lexer_delete(lexer);
-    symtable_delete(symtable);
+    //symtable_delete(SYMTABLE);
     
     return 0;
 }

@@ -156,8 +156,8 @@ int require_token(struct lexer_state *lexer, enum token_type token)
 // Parses a function definition
 struct function *parse_function(struct lexer_state *lexer)
 {
-    char **name_check;
     int error = 0;
+    int i = 0;
     struct function *function = NULL;
 
     // First getting the identifier
@@ -189,12 +189,23 @@ struct function *parse_function(struct lexer_state *lexer)
     function->type = USER; // Until proven otherwise
 
     // Checking against primitive and form lists
-    for(name_check = PRIMITIVE_FUNCTION_NAMES; **name_check; name_check++)
-        if(!strcmp(*name_check, function->name))
+    for(i = 0; *(PRIMITIVE_FUNCTION_NAMES[i]); i++)
+    {
+        if(!strcmp(PRIMITIVE_FUNCTION_NAMES[i], function->name))
+        {
             function->type = PRIMITIVE;
-    for(name_check = FUNCTIONAL_FORM_NAMES; **name_check; name_check++)
-        if(!strcmp(*name_check, function->name))
+            function->index = i;
+        }
+    }
+    
+    for(i = 0; *(FUNCTIONAL_FORM_NAMES[i]); i++)
+    {
+        if(!strcmp(FUNCTIONAL_FORM_NAMES[i], function->name))
+        {
             function->type = FORM;
+            function->index = i;
+        }
+    }
 
     // Now checking for possible arguments
     if(function->type == PRIMITIVE)

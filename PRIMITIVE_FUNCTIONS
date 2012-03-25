@@ -24,3 +24,9 @@
 * value and subtracting each successive value in order.  Result is a floating 
 * point number.
 
+const:
+* Constant function.
+* Specializers - const(n)
+* Input - Any value other than bottom.
+* Output - The value n.
+

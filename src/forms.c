@@ -32,5 +32,18 @@
  */
 struct value *compose(struct list *args, struct value *in)
 {
-    return NULL;
+    struct value *current = in;
+    struct value *last = in;
+    struct function *f = NULL;
+
+    // Stepping backwards through the list of arguments and feeding
+    // input to successive functions, deleting intermediate values
+    for(list_cursor_end(args); args->cursor; list_prev(args))
+    {
+        f = list_at_cursor(args);
+        last = current;
+        current = function_exec(f, current);
+    }
+    
+    return current;
 }

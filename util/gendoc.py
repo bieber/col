@@ -53,7 +53,7 @@ def writeNameHeader(filename, data):
             first = False
         fout.write('"' + entry[0] + '"')
     
-    fout.write("\n");
+    fout.write(",\n\"\"\n");
     fout.close()
 
 # Writes a header file for a function array

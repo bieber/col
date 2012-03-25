@@ -1,0 +1,2 @@
+main = compose{ /, const(<5,2>) }
+

@@ -1,4 +1,5 @@
 multiply,
 add,
 subtract,
-divide
+divide,
+constant
