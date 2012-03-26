@@ -142,6 +142,25 @@ struct value *value_copy(struct value *val)
     return retval;
 }
 
+// Checks a value for bottom, including lists
+int value_is_bottom(struct value *val)
+{
+    struct list *l = NULL;
+
+    if(val->type == BOTTOM_VAL)
+        return 1;
+
+    if(val->type == SEQ_VAL)
+    {
+        l = val->data.seq_val;
+        for(list_cursor_begin(l); l->cursor; list_next(l))
+            if(value_is_bottom(list_at_cursor(l)))
+                return 1;
+    }
+
+    return 0;
+}
+
 // Prints a text representation of a function
 void function_print(struct function *function, int level)
 {
@@ -275,6 +294,13 @@ struct value *function_exec(struct function *function, struct value *in)
 {
     struct value *out = NULL;
 
+    // Check for bottom, in which case there's no need to do anything
+    if(value_is_bottom(in))
+    {
+        value_delete(in);
+        return value_new();
+    }
+
     switch(function->type)
     {
     case USER:
@@ -283,7 +309,7 @@ struct value *function_exec(struct function *function, struct value *in)
         function = symtable_find(SYMTABLE, function->name);
         if(function)
         {
-            return function_exec(function,  in);
+            out = function_exec(function,  in);
         }
         else
         {
@@ -298,13 +324,31 @@ struct value *function_exec(struct function *function, struct value *in)
         // For functional forms, get the apropriate function pointer from the 
         // table and pass it the input
         out = (*FUNCTIONAL_FORMS[function->index])(function->args, in);
-        return out;
+
+        if(value_is_bottom(out))
+        {
+            value_delete(out);
+            return value_new();
+        }
+        else
+        {
+            return out;
+        }
 
     case PRIMITIVE:
         // For primitive functions, get the function pointer from the table, 
         // pass it the input, return result
         out = (*PRIMITIVE_FUNCTIONS[function->index])(function->args, in);
         value_delete(in);
-        return out;
+        
+        if(value_is_bottom(out))
+        {
+            value_delete(out);
+            return value_new();
+        }
+        else
+        {
+            return out;
+        }
     }
 }

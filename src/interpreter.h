@@ -102,6 +102,8 @@ struct value *value_new();
 void value_delete(struct value *value);
 // Copies a value struct, including any lists
 struct value *value_copy(struct value *val);
+// Checks a value for bottom, including lists
+int value_is_bottom(struct value *val);
 
 // Prints a text representation of a function
 void function_print(struct function *function, int level);
