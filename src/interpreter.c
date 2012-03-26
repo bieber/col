@@ -119,6 +119,29 @@ void value_delete(struct value *value)
     free(value);
 }
 
+// Copies a value struct, including any lists
+struct value *value_copy(struct value *val)
+{
+    struct value *retval = value_new();
+    struct list *l = NULL;
+    
+    retval->type = val->type;
+    if(val->type == SEQ_VAL)
+    {
+        // Copying the sequence
+        retval->data.seq_val = list_new();
+        l = val->data.seq_val;
+        for(list_cursor_begin(l); l->cursor; list_next(l))
+            list_push_back(retval->data.seq_val, value_copy(list_at_cursor(l)));
+    }
+    else
+    {
+        retval->data = val->data;
+    }
+
+    return retval;
+}
+
 // Prints a text representation of a function
 void function_print(struct function *function, int level)
 {
@@ -275,14 +298,13 @@ struct value *function_exec(struct function *function, struct value *in)
         // For functional forms, get the apropriate function pointer from the 
         // table and pass it the input
         out = (*FUNCTIONAL_FORMS[function->index])(function->args, in);
-        //value_delete(in);
         return out;
 
     case PRIMITIVE:
         // For primitive functions, get the function pointer from the table, 
         // pass it the input, return result
         out = (*PRIMITIVE_FUNCTIONS[function->index])(function->args, in);
-        //value_delete(in);
+        value_delete(in);
         return out;
     }
 }

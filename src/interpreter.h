@@ -100,6 +100,8 @@ void function_delete(struct function *function);
 struct value *value_new();
 // Deletes a value struct
 void value_delete(struct value *value);
+// Copies a value struct, including any lists
+struct value *value_copy(struct value *val);
 
 // Prints a text representation of a function
 void function_print(struct function *function, int level);

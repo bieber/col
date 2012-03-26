@@ -305,15 +305,11 @@ struct value *divide(struct list *args, struct value *in)
  */
 struct value *constant(struct list *args, struct value *in)
 {
-    struct value *out = value_new();
     struct value *n = list_get(args, 0);
-    out->type = BOTTOM_VAL;
 
     if(n && in->type != BOTTOM_VAL)
-    {
-        out->type = n->type;
-        out->data = n->data;
-    }
+        return value_copy(n);
+    else
+        return value_new(); // struct value is bottom by default
 
-    return out;
 }

@@ -20,7 +20,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include "list.h"
 #include "file.h"
 #include "lexer.h"
 #include "symtable.h"
@@ -29,6 +31,8 @@
 
 #define USAGE "Usage: col [-v] <source file> [command-line arguments]\n"
 
+struct value *args_to_value(int argc, char *argv[]);
+
 int main(int argc, char *argv[])
 {
     int verbose = 0;
@@ -36,6 +40,7 @@ int main(int argc, char *argv[])
     struct lexer_state *lexer = NULL;
     struct value *args = NULL;
     struct value *final = NULL;
+    struct function *user_main;
     
     // Checking presence of command-line arguments
     if(argc < 2)
@@ -44,8 +49,11 @@ int main(int argc, char *argv[])
         return 1;
     }
     
+    argc--;
+    argv++;
+
     // Checking for verbose flag
-    if(!strcmp(argv[1], "-v") || !strcmp(argv[1], "-V"))
+    if(!strcmp(argv[0], "-v") || !strcmp(argv[0], "-V"))
     {
         verbose = 1;
         argc--;
@@ -56,12 +64,14 @@ int main(int argc, char *argv[])
         printf("Reading input file...\n");
 
     // Reading the input file
-    input = read_file(argv[1]);
+    input = read_file(argv[0]);
     if(!input)
     {
         printf("Error reading input file\n");
         return 1;
     }
+    argc--;
+    argv++;
 
     if(verbose)
         printf("Parsing function definitions...\n");
@@ -87,10 +97,28 @@ int main(int argc, char *argv[])
     }
 
     // Running the main function
-    args = value_new(); ///TODO: Actually fill in the command-line args here
-    args->type = INT_VAL;
-    args->data.int_val = 5;
-    final = function_exec(symtable_find(SYMTABLE, "main"), args);
+    args = args_to_value(argc, argv);
+
+    if(verbose)
+    {
+        printf("Command-line arguments:\n");
+        value_print(args, 0);
+        printf("\n");
+    }
+
+    user_main = symtable_find(SYMTABLE, "main");
+    if(user_main)
+    {
+        final = function_exec(user_main, args);
+    }
+    else
+    {
+        printf("Error: No main function defined\n");
+        free(input);
+        lexer_delete(lexer);
+        symtable_delete(SYMTABLE);
+        return 1;
+    }
     
     if(verbose)
     {
@@ -101,7 +129,28 @@ int main(int argc, char *argv[])
     // Cleaning up
     free(input);
     lexer_delete(lexer);
-    //symtable_delete(SYMTABLE);
+    symtable_delete(SYMTABLE);
     
     return 0;
+}
+
+struct value *args_to_value(int argc, char *argv[])
+{
+    struct value *args = value_new();
+    struct value *arg = NULL;
+    int i;
+    
+    args->type = SEQ_VAL;
+    args->data.seq_val = list_new();
+    
+    for(i = 0; i < argc; i++)
+    {
+        arg = value_new();
+        arg->type = STRING_VAL;
+        arg->data.str_val = strdup(argv[i]);
+        
+        list_push_back(args->data.seq_val, arg);
+    }
+
+    return args;
 }
