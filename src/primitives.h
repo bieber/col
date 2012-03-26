@@ -74,4 +74,11 @@ struct value *divide(struct list *args, struct value *in);
  */
 struct value *constant(struct list *args, struct value *in);
 
+/*** id
+ * Identity function.
+ * Input - Any value.
+ * Output - The same value as the input.
+ */
+struct value *id(struct list *args, struct value *in);
+
 #endif // PRIMITIVES_H

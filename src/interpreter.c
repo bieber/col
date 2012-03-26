@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "interpreter.h"
 #include "list.h"
@@ -133,6 +134,10 @@ struct value *value_copy(struct value *val)
         l = val->data.seq_val;
         for(list_cursor_begin(l); l->cursor; list_next(l))
             list_push_back(retval->data.seq_val, value_copy(list_at_cursor(l)));
+    }
+    else if(val->type == STRING_VAL)
+    {
+        retval->data.str_val = strdup(val->data.str_val);
     }
     else
     {

@@ -41,4 +41,11 @@ struct list;
  */
 struct value *compose(struct list *args, struct value *in);
 
+/*** construct
+ * Sequence construction.  Feeds its input to each of its argument functions,
+ * and generate a sequence where each element is the output of one of the 
+ * argument functions.
+ */
+struct value *construct(struct list *args, struct value *in);
+
 #endif // FORMS_H

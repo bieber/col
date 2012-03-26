@@ -30,3 +30,8 @@ const:
 * Input - Any value other than bottom.
 * Output - The value n.
 
+id:
+* Identity function.
+* Input - Any value.
+* Output - The same value as the input.
+

@@ -77,13 +77,13 @@ struct value *add(struct list *args, struct value *in)
     // If we made it to the end, return the new value
     if(is_float)
     {
-        e->type = FLOAT_VAL;
-        e->data.float_val = fval;
+        out->type = FLOAT_VAL;
+        out->data.float_val = fval;
     }
     else
     {
-        e->type = INT_VAL;
-        e->data.int_val = ival;
+        out->type = INT_VAL;
+        out->data.int_val = ival;
     }
 
     return out;
@@ -307,9 +307,18 @@ struct value *constant(struct list *args, struct value *in)
 {
     struct value *n = list_get(args, 0);
 
-    if(n && in->type != BOTTOM_VAL)
+    if(n)
         return value_copy(n);
     else
         return value_new(); // struct value is bottom by default
+}
 
+/*** id
+ * Identity function.
+ * Input - Any value.
+ * Output - The same value as the input.
+ */
+struct value *id(struct list *args, struct value *in)
+{
+    return value_copy(in);
 }

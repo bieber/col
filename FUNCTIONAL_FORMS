@@ -4,3 +4,8 @@ compose:
 * eventually returning the output of the last function in the list as the 
 * combined function's output.
 
+construct:
+* Sequence construction.  Feeds its input to each of its argument functions,
+* and generate a sequence where each element is the output of one of the 
+* argument functions.
+

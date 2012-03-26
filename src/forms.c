@@ -47,3 +47,24 @@ struct value *compose(struct list *args, struct value *in)
     
     return current;
 }
+
+/*** construct
+ * Sequence construction.  Feeds its input to each of its argument functions,
+ * and generate a sequence where each element is the output of one of the 
+ * argument functions.
+ */
+struct value *construct(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+
+    out->type = SEQ_VAL;
+    out->data.seq_val = list_new();
+
+    for(list_cursor_begin(args); args->cursor; list_next(args))
+    {
+        list_push_back(out->data.seq_val, 
+                       function_exec(list_at_cursor(args), value_copy(in)));
+    }
+    value_delete(in);
+    return out;
+}
