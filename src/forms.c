@@ -29,6 +29,8 @@
  * list, then feeds that function's output to the second-to-last, and so on,
  * eventually returning the output of the last function in the list as the 
  * combined function's output.
+ *
+ * compose{ f, g } : x = f : (g : x)
  */
 struct value *compose(struct list *args, struct value *in)
 {
@@ -52,6 +54,8 @@ struct value *compose(struct list *args, struct value *in)
  * Sequence construction.  Feeds its input to each of its argument functions,
  * and generate a sequence where each element is the output of one of the 
  * argument functions.
+ *
+ * construct{ f, g } : x  = < f : x, g : x >
  */
 struct value *construct(struct list *args, struct value *in)
 {
@@ -67,4 +71,48 @@ struct value *construct(struct list *args, struct value *in)
     }
     value_delete(in);
     return out;
+}
+
+/*** if
+ * Conditional form.  Accepts exactly three arguments.  First feeds its input 
+ * to the first argument.  If the result is boolean True, it feeds the input to
+ * its second argument, if False then it feeds it to its third argument, 
+ * otherwise it just returns Bottom.
+ *
+ * if{ f, g, h } : x = if f : x then g : x else h : x
+ */
+struct value *iff(struct list *args, struct value *in)
+{
+    struct value *test = value_copy(in);
+    struct value *out = NULL;
+
+    // Checking for correct number of arguments
+    if(args->count != 3)
+    {
+        value_delete(test);
+        value_delete(in);
+        return value_new();
+    }
+
+    // Testing input with first argument
+    test = function_exec(list_get(args, 0), test);
+
+    if(test->type == BOOL_VAL)
+    {
+        if(test->data.bool_val)
+        {
+            value_delete(test);
+            return function_exec(list_get(args, 1), in);
+        }
+        else
+        {
+            value_delete(test);
+            return function_exec(list_get(args, 2), in);
+        }
+    }
+    else
+    {
+        value_delete(in);
+        return value_new();
+    }
 }

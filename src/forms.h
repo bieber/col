@@ -48,4 +48,14 @@ struct value *compose(struct list *args, struct value *in);
  */
 struct value *construct(struct list *args, struct value *in);
 
+/*** if
+ * Conditional form.  Accepts exactly three arguments.  First feeds its input 
+ * to the first argument.  If the result is boolean True, it feeds the input to
+ * its second argument, if False then it feeds it to its third argument, 
+ * otherwise it just returns Bottom.
+ *
+ * if{ f, g, h } : x = if f : x then g : x else h : x
+ */
+struct value *iff(struct list *args, struct value *in);
+
 #endif // FORMS_H
