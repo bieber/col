@@ -4,4 +4,5 @@ subtract,
 divide,
 constant,
 eq,
-id
+id,
+mod

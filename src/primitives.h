@@ -66,6 +66,15 @@ struct value *multiply(struct list *args, struct value *in);
  */
 struct value *divide(struct list *args, struct value *in);
 
+/*** mod
+ * Modulus operation.
+ * Input - A sequence of two or more integers.
+ * Output - The result of applying the modulus operator (remainder of division)
+ * between the first and second value, then between that result and the third
+ * value, and so on.
+ */
+struct value *mod(struct list *args, struct value *in);
+
 /*** const
  * Constant function.
  * Specializers - const(n)

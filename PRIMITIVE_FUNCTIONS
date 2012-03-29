@@ -41,3 +41,10 @@ id:
 * Input - Any value.
 * Output - The same value as the input.
 
+mod:
+* Modulus operation.
+* Input - A sequence of two or more integers.
+* Output - The result of applying the modulus operator (remainder of division)
+* between the first and second value, then between that result and the third
+* value, and so on.
+

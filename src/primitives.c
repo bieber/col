@@ -19,6 +19,7 @@
  **/
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "list.h"
 #include "primitives.h"
@@ -41,7 +42,7 @@ struct value *add(struct list *args, struct value *in)
 
     // Return bottom if input isn't a sequence
     out->type = BOTTOM_VAL;
-    if(in->type != SEQ_VAL)
+    if(in->type != SEQ_VAL || in->data.seq_val->count < 2)
         return out;
 
     // Iterate through arguments and add them if appropriate
@@ -108,7 +109,7 @@ struct value *subtract(struct list *args, struct value *in)
 
     // First making sure our input is a list
     out->type = BOTTOM_VAL;
-    if(in->type != SEQ_VAL)
+    if(in->type != SEQ_VAL || in->data.seq_val->count < 2)
         return out;
 
     // Subtracting if possible
@@ -191,7 +192,7 @@ struct value *multiply(struct list *args, struct value *in)
 
     // Make sure input is a sequence
     out->type = BOTTOM_VAL;
-    if(in->type != SEQ_VAL)
+    if(in->type != SEQ_VAL || in->data.seq_val->count < 2)
         return out;
 
     // Otherwise step through and multiply
@@ -257,7 +258,7 @@ struct value *divide(struct list *args, struct value *in)
 
     // First make sure we have a sequence input
     out->type = BOTTOM_VAL;
-    if(in->type != SEQ_VAL)
+    if(in->type != SEQ_VAL || in->data.seq_val->count < 2)
         return out;
 
     // Otherwise divide all the values
@@ -294,6 +295,43 @@ struct value *divide(struct list *args, struct value *in)
 
     out->type = FLOAT_VAL;
     out->data.float_val = val;
+    return out;
+}
+
+/*** mod
+ * Modulus operation.
+ * Input - A sequence of two or more integers.
+ * Output - The result of applying the modulus operator (remainder of division)
+ * between the first and second value, then between that result and the third
+ * value, and so on.
+ */
+struct value *mod(struct list *args, struct value *in)
+{
+    struct list *l = NULL;
+    struct value *out = value_new();
+    struct value *e = NULL;
+    int result = -1;
+
+    // Checking for invalid input
+    if(in->type != SEQ_VAL || in->data.seq_val->count < 2)
+        return out;
+
+    // Performing the modulo operation
+    l = in->data.seq_val;
+    for(list_cursor_begin(l); l->cursor; list_next(l))
+    {
+        e = list_at_cursor(l);
+        if(e->type != INT_VAL)
+            return out;
+
+        if(result < 0)
+            result = e->data.int_val;
+        else
+            result %= e->data.int_val;
+    }
+
+    out->type = INT_VAL;
+    out->data.int_val = result;
     return out;
 }
 
