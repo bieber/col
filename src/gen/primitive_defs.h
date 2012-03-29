@@ -7,4 +7,7 @@ eq,
 to_float,
 id,
 to_int,
-mod
+mod,
+print_str,
+println_str,
+to_string

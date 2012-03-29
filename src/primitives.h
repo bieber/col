@@ -121,4 +121,30 @@ struct value *to_int(struct list *args, struct value *in);
  */
 struct value *to_float(struct list *args, struct value *in);
 
+/*** str
+ * String conversion function.
+ * Input - Any value other than bottom.
+ * Output - A conversion of the input value to a string.
+ */
+struct value *to_string(struct list *args, struct value *in);
+
+/*** print
+ * Prints output to the screen.
+ * Input - A string value.
+ * Output - The same string that was passed in as input, or bottom if a 
+ * non-string is passed in.  In additition to passing its input through 
+ * unchanged, the print function prints its string input out to the screen.
+ */
+struct value *print_str(struct list *args, struct value *in);
+
+/*** println
+ * Prints output to a line on the screen.
+ * Input - A string value.
+ * Output - The same string that was passed in as input, or bottom if a 
+ * non-string is passed in.  In addition to passing its input through 
+ * unchanged, the println function prints its string input to the screen with an
+ * additional newline at the end.
+ */
+struct value *println_str(struct list *args, struct value *in);
+
 #endif // PRIMITIVES_H

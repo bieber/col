@@ -20,10 +20,13 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "list.h"
 #include "primitives.h"
 #include "interpreter.h"
+
+#define STRING_BUF_SIZE 1024
 
 /*** +
  * Basic addition function.
@@ -531,4 +534,83 @@ struct value *to_float(struct list *args, struct value *in)
     }
 
     return out;
+}
+
+/*** str
+ * String conversion function.
+ * Input - Any value other than bottom.
+ * Output - A conversion of the input value to a string.
+ */
+struct value *to_string(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+    out->type = STRING_VAL;
+    out->data.str_val = (char*)malloc(sizeof(char) * STRING_BUF_SIZE);
+
+    switch(in->type)
+    {
+    case INT_VAL:
+        snprintf(out->data.str_val, 1024, "%d", in->data.int_val);
+        break;
+
+    case FLOAT_VAL:
+        snprintf(out->data.str_val, 1024, "%lf", in->data.float_val);
+        break;
+
+    case CHAR_VAL:
+        snprintf(out->data.str_val, 1024, "%c", in->data.char_val);
+        break;
+
+    case STRING_VAL:
+        free(out->data.str_val);
+        out->data.str_val = strdup(in->data.str_val);
+        break;
+
+    case BOOL_VAL:
+        snprintf(out->data.str_val, 1024, "%s",
+                 in->data.bool_val ? "True" : "False");
+        break;
+
+    case SEQ_VAL:
+        snprintf(out->data.str_val, 1024, "Sequence of length %d",
+                 in->data.seq_val->count);
+        break;
+    }
+
+    return out;
+}
+
+/*** print
+ * Prints output to the screen.
+ * Input - A string value.
+ * Output - The same string that was passed in as input, or bottom if a 
+ * non-string is passed in.  In additition to passing its input through 
+ * unchanged, the print function prints its string input out to the screen.
+ */
+struct value *print_str(struct list *args, struct value *in)
+{
+    if(in->type != STRING_VAL)
+        return value_new();
+
+    printf("%s", in->data.str_val);
+    
+    return value_copy(in);
+}
+
+/*** println
+ * Prints output to a line on the screen.
+ * Input - A string value.
+ * Output - The same string that was passed in as input, or bottom if a 
+ * non-string is passed in.  In addition to passing its input through 
+ * unchanged, the println function prints its string input to the screen with an
+ * additional newline at the end.
+ */
+struct value *println_str(struct list *args, struct value *in)
+{
+    if(in->type != STRING_VAL)
+        return value_new();
+    
+    printf("%s\n", in->data.str_val);
+
+    return value_copy(in);
 }

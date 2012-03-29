@@ -8,4 +8,7 @@
 "id",
 "int",
 "mod",
+"print",
+"println",
+"str",
 ""
