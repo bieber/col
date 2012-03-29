@@ -443,3 +443,92 @@ struct value *eq(struct list *args, struct value *in)
     out->data.bool_val = 1;
     return out;
 }
+
+/*** int
+ * Integer conversion function.
+ * Input - Any value other than bottom.
+ * Output - A conversion of the input value to an integer.  Floats are 
+ * truncated, integers are passed through verbatim.  True becomes 1, False 
+ * becomes 0.  Chars are converted to their ASCII values.  Strings are 
+ * converted with the C atoi function.  Sequences simply return the sequence 
+ * length.
+ */
+struct value *to_int(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+    out->type = INT_VAL;
+
+    switch(in->type)
+    {
+    case INT_VAL:
+        out->data.int_val = in->data.int_val;
+        break;
+        
+    case FLOAT_VAL:
+        out->data.int_val = (int)in->data.float_val;
+        break;
+
+    case CHAR_VAL:
+        out->data.int_val = (int)in->data.char_val;
+        break;
+        
+    case STRING_VAL:
+        out->data.int_val = atoi(in->data.str_val);
+        break;
+
+    case BOOL_VAL:
+        out->data.int_val = in->data.bool_val ? 1 : 0;
+        break;
+
+    case SEQ_VAL:
+        out->data.int_val = in->data.seq_val->count;
+        break;
+    }
+
+    return out;
+}
+
+/*** float
+ * Floating point conversion function.
+ * Input - Any value other than bottom.
+ * Output - A conversion of the input value to a floating point number.  
+ * Integers are simply cast to floating point, floating point numbers are 
+ * passed through verbatim.  True becomes 1.0, False becomes 0.0.  Chars are 
+ * converted to their ASCII values and then cast to floating point.  Strings 
+ * are converted with the C atof funciton.  Sequences simply return the 
+ * sequence length.
+ */
+struct value *to_float(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+    out->type = FLOAT_VAL;
+
+    switch(in->type)
+    {
+    case INT_VAL:
+        out->data.float_val = (double)in->data.int_val;
+        break;
+        
+    case FLOAT_VAL:
+        out->data.float_val = in->data.float_val;
+        break;
+
+    case CHAR_VAL:
+        out->data.float_val = (double)((int)in->data.char_val);
+        break;
+
+    case STRING_VAL:
+        out->data.float_val = atof(in->data.str_val);
+        break;
+
+    case BOOL_VAL:
+        out->data.float_val = in->data.bool_val ? 1.0 : 0.0;
+        break;
+        
+    case SEQ_VAL:
+        out->data.float_val = (float)in->data.seq_val->count;
+        break;
+    }
+
+    return out;
+}

@@ -4,5 +4,7 @@ subtract,
 divide,
 constant,
 eq,
+to_float,
 id,
+to_int,
 mod

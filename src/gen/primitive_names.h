@@ -4,6 +4,8 @@
 "/",
 "const",
 "eq",
+"float",
 "id",
+"int",
 "mod",
 ""
