@@ -2,16 +2,47 @@ Copyright 2012, Robert Bieber
 
 col is a simple programming language, inspired by John Backus' FP language, 
 although not strictly adhering to it.  Currently the interpreter only supports 
-file execution, a full REPL environment will come later.  To execute a file, 
-simply run
+file execution, a full REPL environment will come later.  
+
+-------------------
+BUILDING COL
+-------------------
+
+To build the col interpreter, extract the project files into a directory and 
+cd to it.  Then run the following commands:
+
+  mkdir build
+  cd build
+  cmake ..
+  make
+
+You can install col with the command:
+
+  make install
+  
+If you modify any of the primitive functions or functional forms in 
+primitives.h/c and forms.h/c, you will also need to run the script
+
+  utils/gendoc.py
+  
+Be sure to execute this script from the project root directory.  It will update 
+auto-generated function pointer tables in the src/gen directory as well as the 
+PRIMITIVE_FUNCTIONS and FUNCTIONAL_FORMS documentation files in the root 
+directory.
+
+-------------------
+RUNNING COL
+-------------------
+
+To execute a file, simply run
 
 col [-v] <source file> [optional command line arguments]
 
 and the interpreter will load the code in program.col and execute its main
 function.  The main function is called with any command-line arguments passed
 to it as a sequence of strings (see language reference for details).  If the -v 
-flag is passed, the interpreter will print debugging information before running 
-the program.
+flag is passed, the interpreter will print debugging information before and 
+after running the program.
 
 -------------------
 LANGUAGE REFERENCE 
@@ -251,4 +282,11 @@ LANGUAGE REFERENCE
 
     <constant> ::= <value>
                  | "<" <constant-arguments> ">"
+
+8 - Further Reference
+  All of the available primitive functions and functional forms are documented 
+  in the files FUNCTIONAL_FORMS and PRIMITIVE_FUNCTIONS in the project root 
+  directory.  They are listed in alphabetical order with a definition and 
+  description of each provided.
+
 

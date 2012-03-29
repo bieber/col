@@ -38,6 +38,8 @@ struct list;
  * list, then feeds that function's output to the second-to-last, and so on,
  * eventually returning the output of the last function in the list as the 
  * combined function's output.
+ *
+ * compose{ f, g } : x = f : (g : x)
  */
 struct value *compose(struct list *args, struct value *in);
 
@@ -45,6 +47,8 @@ struct value *compose(struct list *args, struct value *in);
  * Sequence construction.  Feeds its input to each of its argument functions,
  * and generate a sequence where each element is the output of one of the 
  * argument functions.
+ *
+ * construct{ f, g } : x  = < f : x, g : x >
  */
 struct value *construct(struct list *args, struct value *in);
 
