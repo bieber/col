@@ -81,4 +81,12 @@ struct value *constant(struct list *args, struct value *in);
  */
 struct value *id(struct list *args, struct value *in);
 
+/*** eq
+ * Comparison function.
+ * Input - A sequence of two or more values.
+ * Output - True if all values in the sequence are equivalent, False if they are
+ * not, or bottom for invalid input.
+ */
+struct value *eq(struct list *args, struct value *in);
+
 #endif // PRIMITIVES_H

@@ -30,6 +30,12 @@ const:
 * Input - Any value other than bottom.
 * Output - The value n.
 
+eq:
+* Comparison function.
+* Input - A sequence of two or more values.
+* Output - True if all values in the sequence are equivalent, False if they are
+* not, or bottom for invalid input.
+
 id:
 * Identity function.
 * Input - Any value.

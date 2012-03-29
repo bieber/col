@@ -322,3 +322,86 @@ struct value *id(struct list *args, struct value *in)
 {
     return value_copy(in);
 }
+
+int _compare_values(struct value *a, struct value *b)
+{
+    struct list *la = NULL;
+    struct list *lb = NULL;
+
+    if(a->type != b->type)
+        return 0;
+
+    if(a->type == SEQ_VAL)
+    {
+        la = a->data.seq_val;
+        lb = b->data.seq_val;
+
+        if(la->count != lb->count)
+            return 0;
+
+        for(list_cursor_begin(la), list_cursor_begin(lb);
+            la->cursor && lb->cursor;
+            list_next(la), list_next(lb))
+        {
+            if(!_compare_values(list_at_cursor(la), list_at_cursor(lb)))
+                return 0;
+        }
+    }
+    else
+    {
+        switch(a->type)
+        {
+        case INT_VAL:
+            return a->data.int_val == b->data.int_val;
+        case FLOAT_VAL:
+            return a->data.float_val == b->data.float_val;
+        case BOOL_VAL:
+            return a->data.bool_val == b->data.float_val;
+        case CHAR_VAL:
+            return a->data.char_val == b->data.char_val;
+        case BOTTOM_VAL:
+            return 1;
+        case STRING_VAL:
+            return !strcmp(a->data.str_val, b->data.str_val);
+        }
+    }
+
+    return 1;
+}
+
+/*** eq
+ * Comparison function.
+ * Input - A sequence of two or more values.
+ * Output - True if all values in the sequence are equivalent, False if they are
+ * not, or bottom for invalid input.
+ */
+struct value *eq(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+    struct value *last = NULL;
+    struct list *l = NULL;
+    
+    // Making sure we at least have a sequence
+    if(in->type != SEQ_VAL || in->data.seq_val->count < 2)
+        return out;
+
+    out->type = BOOL_VAL;
+    out->data.bool_val = 0;
+
+    // Now step through and compare adjacent values
+    l = in->data.seq_val;
+    list_cursor_begin(l);
+    last = list_at_cursor(l);
+    list_next(l);
+    
+    while(l->cursor)
+    {
+        if(!_compare_values(last, list_at_cursor(l)))
+            return out;
+        last = list_at_cursor(l);
+        list_next(l);
+    }
+
+    out->data.bool_val = 1;
+    return out;
+}
