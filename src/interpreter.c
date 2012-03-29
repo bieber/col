@@ -105,7 +105,7 @@ void value_delete(struct value *value)
 {
     struct list *l = NULL;
 
-    if(value->type == SEQ_VAL)
+    if(value->type == SEQ_VAL && value->data.seq_val)
     {
         l = value->data.seq_val;
         for(list_cursor_begin(l); l->cursor; list_next(l))
