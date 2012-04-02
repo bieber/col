@@ -4,6 +4,6 @@ FILE(GLOB SOURCE_FILES "*.c")
 FILE(GLOB HEADER_FILES "*.h" "gen/*.h")
 SET(SOURCES ${SOURCE_FILES} ${HEADER_FILES})
 
-add_executable(col ${SOURCE_FILES})
-install(TARGETS col DESTINATION bin)
+add_executable(colint ${SOURCE_FILES})
+install(TARGETS colint DESTINATION bin)
 
