@@ -62,4 +62,13 @@ struct value *construct(struct list *args, struct value *in);
  */
 struct value *iff(struct list *args, struct value *in);
 
+/*** map
+ * Mapping functional form.  Accepts a single function argument.  Input to the 
+ * form should always be in the form of a list, and the return value will be 
+ * the result of applying the argument function to each element in the list.
+ *
+ * map{ f } : < x, y, z> = < f : x, f : y, f : z >
+ */
+struct value *map(struct list *args, struct value *in);
+
 #endif // FORMS_H

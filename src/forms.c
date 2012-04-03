@@ -116,3 +116,40 @@ struct value *iff(struct list *args, struct value *in)
         return value_new();
     }
 }
+
+/*** map
+ * Mapping functional form.  Accepts a single function argument.  Input to the 
+ * form should always be in the form of a list, and the return value will be 
+ * the result of applying the argument function to each element in the list.
+ *
+ * map{ f } : < x, y, z> = < f : x, f : y, f : z >
+ */
+struct value *map(struct list *args, struct value *in)
+{
+    
+    struct value *out = NULL;
+    struct function *f = list_get(args, 0);
+    struct list *l = NULL;
+
+    // First ensure valid input
+    if(args->count != 1 || in->type != SEQ_VAL)
+    {
+        value_delete(in);
+        return value_new();
+    }
+    
+    // Otherwise create an output list by applying f to each element of in
+    out = value_new();
+    out->type = SEQ_VAL;
+    out->data.seq_val = list_new();
+
+    l = in->data.seq_val;
+
+    for(list_cursor_begin(l); l->cursor; list_next(l))
+        list_push_back(out->data.seq_val,
+                       function_exec(f, value_copy(list_at_cursor(l))));
+    
+    value_delete(in);
+    return out;
+
+}
