@@ -24,6 +24,16 @@
 * value and subtracting each successive value in order.  Result is a floating 
 * point number.
 
+1+:
+* Incrementor function.
+* Input - An integer or floating point number.
+* Output - The input + 1.
+
+1-:
+* Decrementor function.
+* Input - An integer or floating point number.
+* Output - The input - 1.
+
 const:
 * Constant function.
 * Specializers - const(n)

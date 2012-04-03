@@ -75,6 +75,20 @@ struct value *divide(struct list *args, struct value *in);
  */
 struct value *mod(struct list *args, struct value *in);
 
+/*** 1+
+ * Incrementor function.
+ * Input - An integer or floating point number.
+ * Output - The input + 1.
+ */
+struct value *one_plus(struct list *args, struct value *in);
+
+/*** 1-
+ * Decrementor function.
+ * Input - An integer or floating point number.
+ * Output - The input - 1.
+ */
+struct value *one_minus(struct list *args, struct value *in);
+
 /*** const
  * Constant function.
  * Specializers - const(n)

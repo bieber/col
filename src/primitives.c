@@ -338,6 +338,54 @@ struct value *mod(struct list *args, struct value *in)
     return out;
 }
 
+
+/*** 1+
+ * Incrementor function.
+ * Input - An integer or floating point number.
+ * Output - The input + 1.
+ */
+struct value *one_plus(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+
+    if(in->type == INT_VAL)
+    {
+        out->type = INT_VAL;
+        out->data.int_val = in->data.int_val + 1;
+    }
+    else if(in->type == FLOAT_VAL)
+    {
+        out->type = FLOAT_VAL;
+        out->data.float_val = in->data.float_val + 1.0;
+    }
+
+    return out;
+}
+
+/*** 1-
+ * Decrementor function.
+ * Input - An integer or floating point number.
+ * Output - The input - 1.
+ */
+struct value *one_minus(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+
+    if(in->type == INT_VAL)
+    {
+        out->type = INT_VAL;
+        out->data.int_val = in->data.int_val - 1;
+    }
+    else if(in->type == FLOAT_VAL)
+    {
+        out->type = FLOAT_VAL;
+        out->data.float_val = in->data.float_val - 1.0;
+    }
+
+    return out;
+}
+
+
 /*** const
  * Constant function.
  * Specializers - const(n)
