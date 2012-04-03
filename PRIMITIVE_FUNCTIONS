@@ -56,6 +56,11 @@ float:
 * are converted with the C atof funciton.  Sequences simply return the 
 * sequence length.
 
+head:
+* Returns the first element of a sequence.
+* Input - A sequence.
+* Output - The first item in that sequence, or <> if the sequence is empty.
+
 id:
 * Identity function.
 * Input - Any value.
@@ -96,4 +101,10 @@ str:
 * String conversion function.
 * Input - Any value other than bottom.
 * Output - A conversion of the input value to a string.
+
+tail:
+* Returns the portion of a sequence after the head.
+* Input - A sequence
+* Output - A sequence containing every element in the input sequence except
+* for the first, or <> if the sequence is empty.
 

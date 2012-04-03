@@ -662,3 +662,58 @@ struct value *println_str(struct list *args, struct value *in)
 
     return value_copy(in);
 }
+
+/*** head
+ * Returns the first element of a sequence.
+ * Input - A sequence.
+ * Output - The first item in that sequence, or <> if the sequence is empty.
+ */
+struct value *head(struct list *args, struct value *in)
+{
+    struct value *out = NULL;
+
+    if(in->type != SEQ_VAL)
+    {
+        return value_new();
+    }
+    else if(in->data.seq_val->count > 0)
+    {
+        return value_copy(list_get(in->data.seq_val, 0));
+    }
+    else
+    {
+        out = value_new();
+        out->type = SEQ_VAL;
+        out->data.seq_val = list_new();
+        return out;
+    }
+}
+
+/*** tail
+ * Returns the portion of a sequence after the head.
+ * Input - A sequence
+ * Output - A sequence containing every element in the input sequence except
+ * for the first, or <> if the sequence is empty.
+ */
+struct value *tail(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+    struct list *l = NULL;
+
+    if(in->type != SEQ_VAL)
+    {
+        return out;
+    }
+    
+    out->type = SEQ_VAL;
+    out->data.seq_val = list_new();
+
+    if(in->data.seq_val->count > 0)
+    {
+        l = in->data.seq_val;
+        for(list_cursor_begin(l), list_next(l); l->cursor; list_next(l))
+            list_push_back(out->data.seq_val, value_copy(list_at_cursor(l)));
+    }
+
+    return out;
+}

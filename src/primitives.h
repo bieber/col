@@ -161,4 +161,19 @@ struct value *print_str(struct list *args, struct value *in);
  */
 struct value *println_str(struct list *args, struct value *in);
 
+/*** head
+ * Returns the first element of a sequence.
+ * Input - A sequence.
+ * Output - The first item in that sequence, or <> if the sequence is empty.
+ */
+struct value *head(struct list *args, struct value *in);
+
+/*** tail
+ * Returns the portion of a sequence after the head.
+ * Input - A sequence
+ * Output - A sequence containing every element in the input sequence except
+ * for the first, or <> if the sequence is empty.
+ */
+struct value *tail(struct list *args, struct value *in);
+
 #endif // PRIMITIVES_H

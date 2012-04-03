@@ -7,10 +7,12 @@
 "const",
 "eq",
 "float",
+"head",
 "id",
 "int",
 "mod",
 "print",
 "println",
 "str",
+"tail",
 ""

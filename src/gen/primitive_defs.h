@@ -7,9 +7,11 @@ one_minus,
 constant,
 eq,
 to_float,
+head,
 id,
 to_int,
 mod,
 print_str,
 println_str,
-to_string
+to_string,
+tail
