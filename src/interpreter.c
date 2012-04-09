@@ -321,8 +321,8 @@ struct value *function_exec(struct function *function, struct value *in)
             out = value_new();
             value_delete(in);
         }   
-        return out;
-
+        break;
+        
     case FORM:
         // For functional forms, get the apropriate function pointer from the 
         // table and pass it the input
@@ -331,12 +331,9 @@ struct value *function_exec(struct function *function, struct value *in)
         if(value_is_bottom(out))
         {
             value_delete(out);
-            return value_new();
+            out = value_new();
         }
-        else
-        {
-            return out;
-        }
+        break;
 
     case PRIMITIVE:
         // For primitive functions, get the function pointer from the table, 
@@ -347,11 +344,10 @@ struct value *function_exec(struct function *function, struct value *in)
         if(value_is_bottom(out))
         {
             value_delete(out);
-            return value_new();
+            out = value_new();
         }
-        else
-        {
-            return out;
-        }
+        break;
     }
+
+    return out;
 }
