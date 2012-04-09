@@ -198,12 +198,13 @@ LANGUAGE REFERENCE
   return value of the combined function.  Consider the following function 
   definition (more on function definitions later):
   
-    inc-then-print = compose{ print, 1+ }
+    inc-then-print = compose{ print, str, 1+ }
     
-  The primitive function 1+ increments a numeric value by one, and the print 
-  function writes a value out to the screen.  The result of combining the two 
-  with the compose form is a function which first increments the value passed to
-  it and then prints the incremented value to the screen.
+  The primitive function 1+ increments a numeric value by one, the str function 
+  converts it to a string, and the print function writes a string out to the 
+  screen.  The result of combining the three with the compose form is a function
+  which first increments the value passed to it and then prints the incremented 
+  value to the screen.
   
 6 - Function Definitions
   A program in col is written as a series of function definitions.  The 
