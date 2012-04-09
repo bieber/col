@@ -978,3 +978,47 @@ struct value *length(struct list *args, struct value *in)
     
     return out;
 }
+
+/*** append
+ * Appends an item to the end of a sequence.
+ * Input - A sequence of length 2.  The second element must be a list.
+ * Output - The first element of the input appended onto the end of the second.
+ */
+struct value *append(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+    struct list *l = NULL;
+
+    if(in->type != SEQ_VAL
+       || in->data.seq_val->count != 2 
+       || ((struct value*)list_get(in->data.seq_val, 1))->type != SEQ_VAL)
+        return out;
+
+    l = in->data.seq_val;
+    out = value_copy(list_get(l, 1));
+    list_push_back(out->data.seq_val, value_copy(list_get(l, 0)));
+    return out;
+}
+
+/*** prepend
+ * Prepends an item to the beginning of a sequence.
+ * Input - A sequence of length 2.  The second element must be a list.
+ * Output - The first element of the input prepended to the beginning of the 
+ * second.
+ */
+struct value *prepend(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+    struct list *l = NULL;
+
+    if(in->type != SEQ_VAL
+       || in->data.seq_val->count != 2 
+       || ((struct value*)list_get(in->data.seq_val, 1))->type != SEQ_VAL)
+        return out;
+
+    l = in->data.seq_val;
+    out = value_copy(list_get(l, 1));
+    list_push(out->data.seq_val, value_copy(list_get(l, 0)));
+    return out;
+}
+

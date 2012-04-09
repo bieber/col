@@ -219,4 +219,19 @@ struct value *tail(struct list *args, struct value *in);
  */
 struct value *length(struct list *args, struct value *in);
 
+/*** append
+ * Appends an item to the end of a sequence.
+ * Input - A sequence of length 2.  The second element must be a list.
+ * Output - The first element of the input appended onto the end of the second.
+ */
+struct value *append(struct list *args, struct value *in);
+
+/*** prepend
+ * Prepends an item to the beginning of a sequence.
+ * Input - A sequence of length 2.  The second element must be a list.
+ * Output - The first element of the input prepended to the beginning of the 
+ * second.
+ */
+struct value *prepend(struct list *args, struct value *in);
+
 #endif // PRIMITIVES_H

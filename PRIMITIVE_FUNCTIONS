@@ -34,6 +34,11 @@
 * Input - An integer or floating point number.
 * Output - The input - 1.
 
+append:
+* Appends an item to the end of a sequence.
+* Input - A sequence of length 2.  The second element must be a list.
+* Output - The first element of the input appended onto the end of the second.
+
 const:
 * Constant function.
 * Specializers - const(n)
@@ -114,6 +119,12 @@ mod:
 * Output - The result of applying the modulus operator (remainder of division)
 * between the first and second value, then between that result and the third
 * value, and so on.
+
+prepend:
+* Prepends an item to the beginning of a sequence.
+* Input - A sequence of length 2.  The second element must be a list.
+* Output - The first element of the input prepended to the beginning of the 
+* second.
 
 print:
 * Prints output to the screen.
