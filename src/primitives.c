@@ -256,7 +256,9 @@ struct value *divide(struct list *args, struct value *in)
     struct value *out = value_new();
     struct list *l = NULL;
     struct value *e = NULL;
-    float val = 0;
+    float fval = 0;
+    int ival = 0;
+    int is_float = 0;
     int is_first = 1;
 
     // First make sure we have a sequence input
@@ -275,11 +277,23 @@ struct value *divide(struct list *args, struct value *in)
             if(is_first)
             {
                 is_first = 0;
-                val = e->data.int_val;
+                ival = e->data.int_val;
             }
             else
             {
-                val /= e->data.int_val;
+                if(is_float)
+                {
+                    fval /= e->data.int_val;
+                }
+                else if(ival % e->data.int_val != 0)
+                {
+                    fval = (double)ival / e->data.int_val;
+                    is_float = 1;
+                }
+                else
+                {
+                    ival /= e->data.int_val;
+                }
             }
         }
         else if(e->type == FLOAT_VAL)
@@ -287,17 +301,29 @@ struct value *divide(struct list *args, struct value *in)
             if(is_first)
             {
                 is_first = 0;
-                val = e->data.float_val;
+                fval = e->data.float_val;
+                is_float = 1;
             }
             else
             {
-                val /= e->data.float_val;
+                if(is_float)
+                {
+                    fval /= e->data.float_val;
+                }
+                else
+                {
+                    fval = ival / e->data.float_val;
+                    is_float = 1;
+                }
             }
         }
     }
 
-    out->type = FLOAT_VAL;
-    out->data.float_val = val;
+    out->type = is_float ? FLOAT_VAL : INT_VAL;
+    if(is_float)
+        out->data.float_val = fval;
+    else
+        out->data.int_val = ival;
     return out;
 }
 
