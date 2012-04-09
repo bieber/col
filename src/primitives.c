@@ -959,19 +959,22 @@ struct value *tail(struct list *args, struct value *in)
 }
 
 /*** length
- * Returns the length of a sequence.
- * Input - A sequence.
- * Output - The length of the sequence as an integer.
+ * Returns the length of a sequence or string.
+ * Input - A sequence or string.
+ * Output - The length of the input as an integer.
  */
 struct value *length(struct list *args, struct value *in)
 {
     struct value *out = value_new();
     
-    if(in->type != SEQ_VAL)
+    if(in->type != SEQ_VAL && in->type != STRING_VAL)
         return out;
 
     out->type = INT_VAL;
-    out->data.int_val = in->data.seq_val->count;
+    if(in->type == SEQ_VAL)
+        out->data.int_val = in->data.seq_val->count;
+    else
+        out->data.int_val = strlen(in->data.str_val);
     
     return out;
 }
