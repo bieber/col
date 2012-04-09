@@ -495,6 +495,246 @@ struct value *eq(struct list *args, struct value *in)
     return out;
 }
 
+/* Return values:
+ * -1 : a < b
+ *  0 : a = b
+ * +1 : a > b
+ * -2 : Error
+ */
+int __order_values(struct value *a, struct value *b)
+{
+    switch(a->type)
+    {
+    case INT_VAL:
+        if(b->type == INT_VAL)
+        {
+            if(a->data.int_val < b->data.int_val)
+                return -1;
+            else if(a->data.int_val == b->data.int_val)
+                return 0;
+            else 
+                return 1;
+        }
+        else if(b->type == FLOAT_VAL)
+        {
+            if(a->data.int_val < b->data.float_val)
+                return -1;
+            else if(a->data.int_val == b->data.float_val)
+                return 0;
+            else
+                return 1;
+        }
+        else
+        {
+            return -2;
+        }
+
+    case FLOAT_VAL:
+        if(b->type == INT_VAL)
+        {
+            if(a->data.float_val < b->data.int_val)
+                return -1;
+            else if(a->data.float_val == b->data.int_val)
+                return 0;
+            else
+                return 1;
+        }
+        else if(b->type == FLOAT_VAL)
+        {
+            if(a->data.float_val < b->data.float_val)
+                return -1;
+            else if(a->data.float_val == b->data.float_val)
+                return 0;
+            else
+                return 1;
+        }
+        else
+        {
+            return -2;
+        }
+
+    case CHAR_VAL:
+        if(b->type != CHAR_VAL)
+            return -2;
+        
+        if(a->data.char_val < b->data.char_val)
+            return -1;
+        else if(a->data.char_val == b->data.char_val)
+            return 0;
+        else
+            return 1;
+
+    case STRING_VAL:
+        if(b->type != STRING_VAL)
+            return -2;
+
+        return strcmp(a->data.str_val, b->data.str_val);
+
+    default:
+        return -2;
+    }
+}
+
+/*** lt
+ * Less-than comparator.
+ * Input - A sequence consisting either of all numbers, all characters, or 
+ * all strings.
+ * Output - True if each successive element is ordered before the next, False
+ * otherwise.
+ */
+struct value *lt(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+    struct list *l = NULL;
+    void *last = NULL;
+
+    if(in->type != SEQ_VAL)
+        return out;
+    
+    out->type = BOOL_VAL;
+    out->data.bool_val = 0;
+
+    // Ensure each value is greater than the last
+    l = in->data.seq_val;
+    for(list_cursor_begin(l); l->cursor; list_next(l))
+    {
+        // First element gets a pass
+        if(!last)
+        {
+            last = list_at_cursor(l);
+        }
+        else
+        {
+            if(__order_values(list_at_cursor(l), last) <= 0)
+                return out;
+            last = list_at_cursor(l);
+        }
+    }
+
+    out->data.bool_val = 1;
+    return out;
+}
+
+/*** lte
+ * Less-than-or-equal-to comparator.
+ * Input - A Sequence consisting either of all numbers, all characters, or all
+ * strings.
+ * Output - True if each successive element is ordered before or equal to the
+ * next, False otherwise.
+ */
+struct value *lte(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+    struct list *l = NULL;
+    void *last = NULL;
+
+    if(in->type != SEQ_VAL)
+        return out;
+    
+    out->type = BOOL_VAL;
+    out->data.bool_val = 0;
+
+    // Ensure each value is greater than the last
+    l = in->data.seq_val;
+    for(list_cursor_begin(l); l->cursor; list_next(l))
+    {
+        // First element gets a pass
+        if(!last)
+        {
+            last = list_at_cursor(l);
+        }
+        else
+        {
+            if(__order_values(list_at_cursor(l), last) < 0)
+                return out;
+            last = list_at_cursor(l);
+        }
+    }
+
+    out->data.bool_val = 1;
+    return out;
+}
+
+/*** gt
+ * Greater-than comparator.
+ * Input - A sequence consisting either of all numbers, all characters, or all
+ * strings.
+ * Output - True if each successive element is ordered after the next, False 
+ * otherwise.
+ */
+struct value *gt(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+    struct list *l = NULL;
+    void *last = NULL;
+
+    if(in->type != SEQ_VAL)
+        return out;
+    
+    out->type = BOOL_VAL;
+    out->data.bool_val = 0;
+
+    // Ensure each value is greater than the last
+    l = in->data.seq_val;
+    for(list_cursor_begin(l); l->cursor; list_next(l))
+    {
+        // First element gets a pass
+        if(!last)
+        {
+            last = list_at_cursor(l);
+        }
+        else
+        {
+            if(__order_values(last, list_at_cursor(l)) <= 0)
+                return out;
+            last = list_at_cursor(l);
+        }
+    }
+
+    out->data.bool_val = 1;
+    return out;
+}
+
+/*** gte
+ * Greater-than-or-equal-to comparator.
+ * Input - A sequence consisting either of all numbers, all characters, or all
+ * strings.
+ * Output - True if each successive element is ordered after or equal to the 
+ * next, False otherwise.
+ */
+struct value *gte(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+    struct list *l = NULL;
+    void *last = NULL;
+
+    if(in->type != SEQ_VAL)
+        return out;
+    
+    out->type = BOOL_VAL;
+    out->data.bool_val = 0;
+
+    // Ensure each value is greater than the last
+    l = in->data.seq_val;
+    for(list_cursor_begin(l); l->cursor; list_next(l))
+    {
+        // First element gets a pass
+        if(!last)
+        {
+            last = list_at_cursor(l);
+        }
+        else
+        {
+            if(__order_values(last, list_at_cursor(l)) < 0)
+                return out;
+            last = list_at_cursor(l);
+        }
+    }
+
+    out->data.bool_val = 1;
+    return out;
+}
+
 /*** int
  * Integer conversion function.
  * Input - Any value other than bottom.

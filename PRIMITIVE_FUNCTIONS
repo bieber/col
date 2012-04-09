@@ -56,6 +56,20 @@ float:
 * are converted with the C atof funciton.  Sequences simply return the 
 * sequence length.
 
+gt:
+* Greater-than comparator.
+* Input - A sequence consisting either of all numbers, all characters, or all
+* strings.
+* Output - True if each successive element is ordered after the next, False 
+* otherwise.
+
+gte:
+* Greater-than-or-equal-to comparator.
+* Input - A sequence consisting either of all numbers, all characters, or all
+* strings.
+* Output - True if each successive element is ordered after or equal to the 
+* next, False otherwise.
+
 head:
 * Returns the first element of a sequence.
 * Input - A sequence.
@@ -79,6 +93,20 @@ length:
 * Returns the length of a sequence.
 * Input - A sequence.
 * Output - The length of the sequence as an integer.
+
+lt:
+* Less-than comparator.
+* Input - A sequence consisting either of all numbers, all characters, or 
+* all strings.
+* Output - True if each successive element is ordered before the next, False
+* otherwise.
+
+lte:
+* Less-than-or-equal-to comparator.
+* Input - A Sequence consisting either of all numbers, all characters, or all
+* strings.
+* Output - True if each successive element is ordered before or equal to the
+* next, False otherwise.
 
 mod:
 * Modulus operation.

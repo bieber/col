@@ -112,6 +112,42 @@ struct value *id(struct list *args, struct value *in);
  */
 struct value *eq(struct list *args, struct value *in);
 
+/*** lt
+ * Less-than comparator.
+ * Input - A sequence consisting either of all numbers, all characters, or 
+ * all strings.
+ * Output - True if each successive element is ordered before the next, False
+ * otherwise.
+ */
+struct value *lt(struct list *args, struct value *in);
+
+/*** lte
+ * Less-than-or-equal-to comparator.
+ * Input - A Sequence consisting either of all numbers, all characters, or all
+ * strings.
+ * Output - True if each successive element is ordered before or equal to the
+ * next, False otherwise.
+ */
+struct value *lte(struct list *args, struct value *in);
+
+/*** gt
+ * Greater-than comparator.
+ * Input - A sequence consisting either of all numbers, all characters, or all
+ * strings.
+ * Output - True if each successive element is ordered after the next, False 
+ * otherwise.
+ */
+struct value *gt(struct list *args, struct value *in);
+
+/*** gte
+ * Greater-than-or-equal-to comparator.
+ * Input - A sequence consisting either of all numbers, all characters, or all
+ * strings.
+ * Output - True if each successive element is ordered after or equal to the 
+ * next, False otherwise.
+ */
+struct value *gte(struct list *args, struct value *in);
+
 /*** int
  * Integer conversion function.
  * Input - Any value other than bottom.
