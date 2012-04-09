@@ -631,6 +631,12 @@ struct value *lt(struct list *args, struct value *in)
         }
         else
         {
+            if(__order_values(list_at_cursor(l), last) == -2)
+            {
+                out->type = BOTTOM_VAL;
+                return out;
+            }
+
             if(__order_values(list_at_cursor(l), last) <= 0)
                 return out;
             last = list_at_cursor(l);
@@ -671,6 +677,12 @@ struct value *lte(struct list *args, struct value *in)
         }
         else
         {
+            if(__order_values(list_at_cursor(l), last) == -2)
+            {
+                out->type = BOTTOM_VAL;
+                return out;
+            }
+
             if(__order_values(list_at_cursor(l), last) < 0)
                 return out;
             last = list_at_cursor(l);
@@ -711,6 +723,12 @@ struct value *gt(struct list *args, struct value *in)
         }
         else
         {
+            if(__order_values(list_at_cursor(l), last) == -2)
+            {
+                out->type = BOTTOM_VAL;
+                return out;
+            }
+
             if(__order_values(last, list_at_cursor(l)) <= 0)
                 return out;
             last = list_at_cursor(l);
@@ -751,6 +769,12 @@ struct value *gte(struct list *args, struct value *in)
         }
         else
         {
+            if(__order_values(list_at_cursor(l), last) == -2)
+            {
+                out->type = BOTTOM_VAL;
+                return out;
+            }
+
             if(__order_values(last, list_at_cursor(l)) < 0)
                 return out;
             last = list_at_cursor(l);
@@ -1037,6 +1061,8 @@ struct value *prepend(struct list *args, struct value *in)
     struct value *out = value_new();
     struct list *l = NULL;
 
+    printf("In prepend\n");
+
     if(in->type != SEQ_VAL
        || in->data.seq_val->count != 2 
        || ((struct value*)list_get(in->data.seq_val, 1))->type != SEQ_VAL)
@@ -1045,6 +1071,12 @@ struct value *prepend(struct list *args, struct value *in)
     l = in->data.seq_val;
     out = value_copy(list_get(l, 1));
     list_push(out->data.seq_val, value_copy(list_get(l, 0)));
+
+    value_print(list_get(l, 1), 0);
+    value_print(list_get(l, 0), 0);
+    value_print(out, 0);
+    printf("------------\n\n");
+
     return out;
 }
 
