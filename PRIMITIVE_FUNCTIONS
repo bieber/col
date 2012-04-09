@@ -75,6 +75,11 @@ int:
 * converted with the C atoi function.  Sequences simply return the sequence 
 * length.
 
+length:
+* Returns the length of a sequence.
+* Input - A sequence.
+* Output - The length of the sequence as an integer.
+
 mod:
 * Modulus operation.
 * Input - A sequence of two or more integers.

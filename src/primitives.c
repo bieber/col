@@ -717,3 +717,21 @@ struct value *tail(struct list *args, struct value *in)
 
     return out;
 }
+
+/*** length
+ * Returns the length of a sequence.
+ * Input - A sequence.
+ * Output - The length of the sequence as an integer.
+ */
+struct value *length(struct list *args, struct value *in)
+{
+    struct value *out = value_new();
+    
+    if(in->type != SEQ_VAL)
+        return out;
+
+    out->type = INT_VAL;
+    out->data.int_val = in->data.seq_val->count;
+    
+    return out;
+}

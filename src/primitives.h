@@ -176,4 +176,11 @@ struct value *head(struct list *args, struct value *in);
  */
 struct value *tail(struct list *args, struct value *in);
 
+/*** length
+ * Returns the length of a sequence.
+ * Input - A sequence.
+ * Output - The length of the sequence as an integer.
+ */
+struct value *length(struct list *args, struct value *in);
+
 #endif // PRIMITIVES_H
