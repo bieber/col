@@ -1061,8 +1061,6 @@ struct value *prepend(struct list *args, struct value *in)
     struct value *out = value_new();
     struct list *l = NULL;
 
-    printf("In prepend\n");
-
     if(in->type != SEQ_VAL
        || in->data.seq_val->count != 2 
        || ((struct value*)list_get(in->data.seq_val, 1))->type != SEQ_VAL)
@@ -1071,11 +1069,6 @@ struct value *prepend(struct list *args, struct value *in)
     l = in->data.seq_val;
     out = value_copy(list_get(l, 1));
     list_push(out->data.seq_val, value_copy(list_get(l, 0)));
-
-    value_print(list_get(l, 1), 0);
-    value_print(list_get(l, 0), 0);
-    value_print(out, 0);
-    printf("------------\n\n");
 
     return out;
 }

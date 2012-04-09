@@ -319,11 +319,9 @@ struct value *function_exec(struct function *function, struct value *in)
         else
         {
             out = value_new();
-            out->type = BOTTOM_VAL;
             value_delete(in);
-            return out;
         }   
-        break;
+        return out;
 
     case FORM:
         // For functional forms, get the apropriate function pointer from the 
