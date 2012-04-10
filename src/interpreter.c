@@ -68,25 +68,29 @@ struct function *function_new()
 // Deletes a function struct
 void function_delete(struct function *function)
 {
-    struct list *l;
+    struct cursor *c = NULL;
 
     if(function->name)
         free(function->name);
     
     if(function->type == PRIMITIVE && function->args)
     {
-        l = function->args;
-        for(list_cursor_begin(l); l->cursor; list_next(l))
-            value_delete((struct value*)list_at_cursor(l));
-        list_delete(l);
+        for(c = cursor_new_front(function->args)
+                ; cursor_valid(c)
+                ; cursor_next(c))
+            value_delete((struct value*)cursor_get(c));
+        list_delete(function->args);
+        cursor_delete(c);
     }
     
     if(function->type == FORM && function->args)
     {
-        l = function->args;
-        for(list_cursor_begin(l); l->cursor; list_next(l))
-            function_delete((struct function*)list_at_cursor(l));
-        list_delete(l);
+        for(c = cursor_new_front(function->args)
+                ; cursor_valid(c)
+                ; cursor_next(c))
+            function_delete((struct function*)cursor_get(c));
+        list_delete(function->args);
+        cursor_delete(c);
     }
 
     free(function);
@@ -103,14 +107,16 @@ struct value *value_new()
 // Deletes a value struct
 void value_delete(struct value *value)
 {
-    struct list *l = NULL;
+    struct cursor *c = NULL;
 
     if(value->type == SEQ_VAL && value->data.seq_val)
     {
-        l = value->data.seq_val;
-        for(list_cursor_begin(l); l->cursor; list_next(l))
-            value_delete((struct value*)list_at_cursor(l));
+        for(c = cursor_new_front(value->data.seq_val)
+                ; cursor_valid(c)
+                ; cursor_next(c))
+            value_delete((struct value*)cursor_get(c));
         list_delete(value->data.seq_val);
+        cursor_delete(c);
     }
     else if(value->type == STRING_VAL)
     {
@@ -124,16 +130,18 @@ void value_delete(struct value *value)
 struct value *value_copy(struct value *val)
 {
     struct value *retval = value_new();
-    struct list *l = NULL;
+    struct cursor *c = NULL;
     
     retval->type = val->type;
     if(val->type == SEQ_VAL)
     {
         // Copying the sequence
         retval->data.seq_val = list_new();
-        l = val->data.seq_val;
-        for(list_cursor_begin(l); l->cursor; list_next(l))
-            list_push_back(retval->data.seq_val, value_copy(list_at_cursor(l)));
+        for(c = cursor_new_front(val->data.seq_val)
+                ; cursor_valid(c)
+                ; cursor_next(c))
+            list_push_back(retval->data.seq_val, value_copy(cursor_get(c)));
+        cursor_delete(c);
     }
     else if(val->type == STRING_VAL)
     {
@@ -150,17 +158,19 @@ struct value *value_copy(struct value *val)
 // Checks a value for bottom, including lists
 int value_is_bottom(struct value *val)
 {
-    struct list *l = NULL;
+    struct cursor *c = NULL;
 
     if(val->type == BOTTOM_VAL)
         return 1;
 
     if(val->type == SEQ_VAL)
     {
-        l = val->data.seq_val;
-        for(list_cursor_begin(l); l->cursor; list_next(l))
-            if(value_is_bottom(list_at_cursor(l)))
+        for(c = cursor_new_front(val->data.seq_val)
+                ; cursor_valid(c)
+                ; cursor_next(c))
+            if(value_is_bottom(cursor_get(c)))
                 return 1;
+        cursor_delete(c);
     }
 
     return 0;
@@ -170,7 +180,8 @@ int value_is_bottom(struct value *val)
 void function_print(struct function *function, int level)
 {
     int i;
-    struct list *l;
+    struct cursor *c = NULL;
+    struct list *l = NULL;
 
     for(i = 0; i < level; i++)
         printf(" ");
@@ -188,9 +199,10 @@ void function_print(struct function *function, int level)
                 printf(" ");
 
             printf("Arguments:\n");
-            for(list_cursor_begin(l); l->cursor; list_next(l))
-                value_print((struct value*)list_at_cursor(l),
+            for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
+                value_print((struct value*)cursor_get(c),
                             level + INDENT_STEP);
+            cursor_delete(c);
         }
 
         break;
@@ -206,9 +218,10 @@ void function_print(struct function *function, int level)
                 printf(" ");
 
             printf("Arguments:\n");
-            for(list_cursor_begin(l); l->cursor; list_next(l))
-                function_print((struct function*)list_at_cursor(l),
+            for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
+                function_print((struct function*)cursor_get(c),
                                level + INDENT_STEP);
+            cursor_delete(c);
         }
 
         break;
@@ -224,6 +237,7 @@ void value_print(struct value *value, int level)
 {
     int i;
     struct list *l;
+    struct cursor *c = NULL;
 
     for(i = 0; i < level; i++)
         printf(" ");
@@ -261,8 +275,9 @@ void value_print(struct value *value, int level)
         printf("Sequence:\n");
         
         l = value->data.seq_val;
-        for(list_cursor_begin(l); l->cursor; list_next(l))
-            value_print((struct value*)list_at_cursor(l), level + INDENT_STEP);
+        for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
+            value_print((struct value*)cursor_get(c), level + INDENT_STEP);
+        cursor_delete(c);
         break;
 
     default:
@@ -276,6 +291,7 @@ void symtable_print(struct symtable *table)
 {
     int i = 0;
     struct list *l;
+    struct cursor *c = NULL;
     struct symtable_entry *e = NULL;
 
     // Just iterating through the symtable and printing each entry
@@ -283,14 +299,15 @@ void symtable_print(struct symtable *table)
     for(i = 0; i < SYMTABLE_SIZE; i++)
     {
         l = table->entries[i];
-        for(list_cursor_begin(l); l->cursor; list_next(l))
+        for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
         {
-            e = list_at_cursor(l);
+            e = cursor_get(c);
             
             printf("%s = \n", e->name);
             function_print(e->data, 0);
             printf("\n");
         }
+        cursor_delete(c);
     }
 }
 

@@ -461,19 +461,23 @@ struct value *parse_constant(struct lexer_state *lexer)
 // Deletes every value in a list
 void clear_value_list(struct list *args)
 {
-    for(list_cursor_begin(args); args->cursor; list_next(args))
-        if(list_at_cursor(args))
-            value_delete(list_at_cursor(args));
+    struct cursor *c = NULL;
+    for(c = cursor_new_front(args); cursor_valid(c); cursor_next(c))
+        if(cursor_get(c))
+            value_delete(cursor_get(c));
     list_delete(args);
+    cursor_delete(c);
 }
 
 // Deletes every function in a list
 void clear_function_list(struct list *args)
 {
-    for(list_cursor_begin(args); args->cursor; list_next(args))
-        if(list_at_cursor(args))
-            function_delete(list_at_cursor(args));
+    struct cursor *c = NULL;
+    for(c = cursor_new_front(args); cursor_valid(c); cursor_next(c))
+        if(cursor_get(c))
+            function_delete(cursor_get(c));
     list_delete(args);
+    cursor_delete(c);
 }
 
 // Prints an error message

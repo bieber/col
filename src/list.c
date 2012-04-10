@@ -28,7 +28,6 @@ struct list *list_new()
     struct list *retval = (struct list*)malloc(sizeof(struct list));
     retval->front = NULL;
     retval->back = NULL;
-    retval->cursor = NULL;
     retval->count = 0;
     return retval;
 }
@@ -187,9 +186,6 @@ void *list_remove(struct list *list, int element)
             old = old->prev;
     }
 
-    if(list->cursor == old)
-        list->cursor = NULL;
-
     if(old->prev)
         old->prev->next = old->next;
     else
@@ -204,37 +200,69 @@ void *list_remove(struct list *list, int element)
     list->count--;
 }
 
-// Sets the cursor to the beginning of the list
-void list_cursor_begin(struct list *list)
+// Returns a new cursor starting at the beginning of a list
+struct cursor *cursor_new_front(struct list *list)
 {
-    list->cursor = list->front;
+    struct cursor *c = (struct cursor*)malloc(sizeof(struct cursor));
+    c->list = list;
+    c->cursor = list->front;
 }
 
-// Sets the cursor to the end of the list
-void list_cursor_end(struct list *list)
+// Returns a new cursor starting at the back of a list
+struct cursor *cursor_new_back(struct list *list)
 {
-    list->cursor = list->back;
+    struct cursor *c = (struct cursor*)malloc(sizeof(struct cursor));
+    c->list = list;
+    c->cursor = list->back;
 }
 
-// Returns the item at the cursor
-void *list_at_cursor(struct list *list)
+// Deletes a cursor
+void cursor_delete(struct cursor *cursor)
 {
-    if(list->cursor)
-        return list->cursor->data;
+    free(cursor);
+}
+
+// Steps a cursor forward one element
+void cursor_next(struct cursor *cursor)
+{
+    if(cursor->cursor)
+        cursor->cursor = cursor->cursor->next;
+    else
+        cursor->cursor = cursor->list->front;
+}
+
+// Steps a cursor back one element
+void cursor_prev(struct cursor *cursor)
+{
+    if(cursor->cursor)
+        cursor->cursor = cursor->cursor->prev;
+    else
+        cursor->cursor = cursor->list->back;
+}
+
+// Sets a cursor back to the front of the list
+void cursor_rewind(struct cursor *cursor)
+{
+    cursor->cursor = cursor->list->front;
+}
+
+// Sets a cursor to the end of the list
+void cursor_ffwd(struct cursor *cursor)
+{
+    cursor->cursor = cursor->list->back;
+}
+
+// Retrieves the current element pointed at by the cursor
+void *cursor_get(struct cursor *cursor)
+{
+    if(cursor->cursor)
+        return cursor->cursor->data;
     else
         return NULL;
 }
 
-// Increments the cursor
-void list_next(struct list *list)
+// Returns non-zero if cursor points to a valid list element
+void *cursor_valid(struct cursor *cursor)
 {
-    if(list->cursor)
-        list->cursor = list->cursor->next;
-}
-
-// Decrements the cursor
-void list_prev(struct list *list)
-{
-    if(list->cursor)
-        list->cursor = list->cursor->prev;
+    return cursor->cursor ? 1 : 0;
 }

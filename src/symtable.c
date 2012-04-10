@@ -45,6 +45,7 @@ struct symtable *symtable_delete(struct symtable *table)
 {
     int i;
     struct list *list = NULL;
+    struct cursor *c = NULL;
     struct symtable_entry *entry = NULL;
 
     if(!table)
@@ -53,14 +54,15 @@ struct symtable *symtable_delete(struct symtable *table)
     for(i = 0; i < SYMTABLE_SIZE; i++)
     {
         list = table->entries[i];
-        for(list_cursor_begin(list); list->cursor; list_next(list))
+        for(c = cursor_new_front(list); cursor_valid(c); cursor_next(c))
         {
-            entry = list_at_cursor(list);
+            entry = cursor_get(c);
             free(entry->name);
             function_delete(entry->data);
             free(entry);
         }
         list_delete(list);
+        cursor_delete(c);
     }
     
     free(table);
@@ -83,16 +85,20 @@ struct function *symtable_find(struct symtable *table, char *name)
 {
     struct list *list = table->entries[hash(name) % table->size];
     struct symtable_entry *entry = NULL;
+    struct cursor *c = NULL;
 
-    for(list_cursor_begin(list); list->cursor; list_next(list))
+    for(c = cursor_new_front(list); cursor_valid(c); cursor_next(c))
     {
-        entry = list_at_cursor(list);
+        entry = cursor_get(c);
         
         if(!entry)
             break;
 
         if(!strcmp(entry->name, name))
+        {
+            cursor_delete(c);
             return entry->data;
+        }
     }
 
     return NULL;

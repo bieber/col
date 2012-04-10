@@ -39,6 +39,7 @@ struct value *add(struct list *args, struct value *in)
     struct value *out = value_new();
     struct value *e = NULL;
     struct list *l = NULL;
+    struct cursor *c = NULL;
     int is_float = 0;
     int ival = 0;
     float fval = 0;
@@ -50,9 +51,9 @@ struct value *add(struct list *args, struct value *in)
 
     // Iterate through arguments and add them if appropriate
     l = in->data.seq_val;
-    for(list_cursor_begin(l); l->cursor; list_next(l))
+    for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
     {
-        e = list_at_cursor(l);
+        e = cursor_get(c);
         if(e->type == INT_VAL)
         {
             if(is_float)
@@ -74,9 +75,11 @@ struct value *add(struct list *args, struct value *in)
         }
         else
         {
+            cursor_delete(c);
             return out;
         }
     }
+    cursor_delete(c);
 
     // If we made it to the end, return the new value
     if(is_float)
@@ -104,6 +107,7 @@ struct value *subtract(struct list *args, struct value *in)
 {
     struct value *out = value_new();
     struct list *l = NULL;
+    struct cursor *c = NULL;
     struct value *e = NULL;
     int ival = 0;
     int fval = 0;
@@ -117,9 +121,9 @@ struct value *subtract(struct list *args, struct value *in)
 
     // Subtracting if possible
     l = in->data.seq_val;
-    for(list_cursor_begin(l); l->cursor; list_next(l))
+    for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
     {
-        e = list_at_cursor(l);
+        e = cursor_get(c);
 
         if(e->type == FLOAT_VAL)
         {
@@ -159,9 +163,11 @@ struct value *subtract(struct list *args, struct value *in)
         }
         else
         {
+            cursor_delete(c);
             return out;
         }
     }
+    cursor_delete(c);
 
     // If we made it this far, store and return value
     if(is_float)
@@ -188,6 +194,7 @@ struct value *multiply(struct list *args, struct value *in)
 {
     struct value *out = value_new();
     struct list *l = NULL;
+    struct cursor *c = NULL;
     struct value *e = NULL;
     int ival = 1;
     int fval = 1;
@@ -200,9 +207,9 @@ struct value *multiply(struct list *args, struct value *in)
 
     // Otherwise step through and multiply
     l = in->data.seq_val;
-    for(list_cursor_begin(l); l->cursor; list_next(l))
+    for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
     {
-        e = list_at_cursor(l);
+        e = cursor_get(c);
 
         if(e->type == INT_VAL)
         {
@@ -225,9 +232,11 @@ struct value *multiply(struct list *args, struct value *in)
         }
         else
         {
+            cursor_delete(c);
             return out;
         }
     }
+    cursor_delete(c);
 
     // If loop completed, store and return value
     if(is_float)
@@ -255,6 +264,7 @@ struct value *divide(struct list *args, struct value *in)
 {
     struct value *out = value_new();
     struct list *l = NULL;
+    struct cursor *c = NULL;
     struct value *e = NULL;
     float fval = 0;
     int ival = 0;
@@ -268,9 +278,9 @@ struct value *divide(struct list *args, struct value *in)
 
     // Otherwise divide all the values
     l = in->data.seq_val;
-    for(list_cursor_begin(l); l->cursor; list_next(l))
+    for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
     {
-        e = list_at_cursor(l);
+        e = cursor_get(c);
         
         if(e->type == INT_VAL)
         {
@@ -317,7 +327,13 @@ struct value *divide(struct list *args, struct value *in)
                 }
             }
         }
+        else
+        {
+            cursor_delete(c);
+            return out;
+        }
     }
+    cursor_delete(c);
 
     out->type = is_float ? FLOAT_VAL : INT_VAL;
     if(is_float)
@@ -337,6 +353,7 @@ struct value *divide(struct list *args, struct value *in)
 struct value *mod(struct list *args, struct value *in)
 {
     struct list *l = NULL;
+    struct cursor *c = NULL;
     struct value *out = value_new();
     struct value *e = NULL;
     int result = -1;
@@ -347,17 +364,21 @@ struct value *mod(struct list *args, struct value *in)
 
     // Performing the modulo operation
     l = in->data.seq_val;
-    for(list_cursor_begin(l); l->cursor; list_next(l))
+    for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
     {
-        e = list_at_cursor(l);
+        e = cursor_get(c);
         if(e->type != INT_VAL)
+        {
+            cursor_delete(c);
             return out;
+        }
 
         if(result < 0)
             result = e->data.int_val;
         else
             result %= e->data.int_val;
     }
+    cursor_delete(c);
 
     out->type = INT_VAL;
     out->data.int_val = result;
@@ -442,6 +463,8 @@ int _compare_values(struct value *a, struct value *b)
 {
     struct list *la = NULL;
     struct list *lb = NULL;
+    struct cursor *ca = NULL;
+    struct cursor *cb = NULL;
 
     if(a->type != b->type)
         return 0;
@@ -454,13 +477,19 @@ int _compare_values(struct value *a, struct value *b)
         if(la->count != lb->count)
             return 0;
 
-        for(list_cursor_begin(la), list_cursor_begin(lb);
-            la->cursor && lb->cursor;
-            list_next(la), list_next(lb))
+        for(ca = cursor_new_front(la), cb = cursor_new_front(lb)
+                ; cursor_valid(ca) && cursor_valid(cb)
+                ; cursor_next(ca), cursor_next(cb))
         {
-            if(!_compare_values(list_at_cursor(la), list_at_cursor(lb)))
+            if(!_compare_values(cursor_get(ca), cursor_get(cb)))
+            {
+                cursor_delete(ca);
+                cursor_delete(cb);
                 return 0;
+            }
         }
+        cursor_delete(ca);
+        cursor_delete(cb);
     }
     else
     {
@@ -495,6 +524,7 @@ struct value *eq(struct list *args, struct value *in)
     struct value *out = value_new();
     struct value *last = NULL;
     struct list *l = NULL;
+    struct cursor *c = NULL;
     
     // Making sure we at least have a sequence
     if(in->type != SEQ_VAL || in->data.seq_val->count < 2)
@@ -505,17 +535,21 @@ struct value *eq(struct list *args, struct value *in)
 
     // Now step through and compare adjacent values
     l = in->data.seq_val;
-    list_cursor_begin(l);
-    last = list_at_cursor(l);
-    list_next(l);
+    c = cursor_new_front(l);
+    last = cursor_get(c);
+    cursor_next(c);
     
-    while(l->cursor)
+    while(cursor_valid(c))
     {
-        if(!_compare_values(last, list_at_cursor(l)))
+        if(!_compare_values(last, cursor_get(c)))
+        {
+            cursor_delete(c);
             return out;
-        last = list_at_cursor(l);
-        list_next(l);
+        }
+        last = cursor_get(c);;
+        cursor_next(c);
     }
+    cursor_delete(c);
 
     out->data.bool_val = 1;
     return out;
@@ -612,6 +646,7 @@ struct value *lt(struct list *args, struct value *in)
 {
     struct value *out = value_new();
     struct list *l = NULL;
+    struct cursor *c = NULL;
     void *last = NULL;
 
     if(in->type != SEQ_VAL)
@@ -622,26 +657,31 @@ struct value *lt(struct list *args, struct value *in)
 
     // Ensure each value is greater than the last
     l = in->data.seq_val;
-    for(list_cursor_begin(l); l->cursor; list_next(l))
+    for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
     {
         // First element gets a pass
         if(!last)
         {
-            last = list_at_cursor(l);
+            last = cursor_get(c);
         }
         else
         {
-            if(__order_values(list_at_cursor(l), last) == -2)
+            if(__order_values(cursor_get(c), last) == -2)
             {
                 out->type = BOTTOM_VAL;
+                cursor_delete(c);
                 return out;
             }
 
-            if(__order_values(list_at_cursor(l), last) <= 0)
+            if(__order_values(cursor_get(c), last) <= 0)
+            {
+                cursor_delete(c);
                 return out;
-            last = list_at_cursor(l);
+            }
+            last = cursor_get(c);
         }
     }
+    cursor_delete(c);
 
     out->data.bool_val = 1;
     return out;
@@ -658,6 +698,7 @@ struct value *lte(struct list *args, struct value *in)
 {
     struct value *out = value_new();
     struct list *l = NULL;
+    struct cursor *c = NULL;
     void *last = NULL;
 
     if(in->type != SEQ_VAL)
@@ -668,26 +709,31 @@ struct value *lte(struct list *args, struct value *in)
 
     // Ensure each value is greater than the last
     l = in->data.seq_val;
-    for(list_cursor_begin(l); l->cursor; list_next(l))
+    for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
     {
         // First element gets a pass
         if(!last)
         {
-            last = list_at_cursor(l);
+            last = cursor_get(c);
         }
         else
         {
-            if(__order_values(list_at_cursor(l), last) == -2)
+            if(__order_values(cursor_get(c), last) == -2)
             {
                 out->type = BOTTOM_VAL;
+                cursor_delete(c);
                 return out;
             }
 
-            if(__order_values(list_at_cursor(l), last) < 0)
+            if(__order_values(cursor_get(c), last) < 0)
+            {
+                cursor_delete(c);
                 return out;
-            last = list_at_cursor(l);
+            }
+            last = cursor_get(c);
         }
     }
+    cursor_delete(c);
 
     out->data.bool_val = 1;
     return out;
@@ -704,6 +750,7 @@ struct value *gt(struct list *args, struct value *in)
 {
     struct value *out = value_new();
     struct list *l = NULL;
+    struct cursor *c = NULL;
     void *last = NULL;
 
     if(in->type != SEQ_VAL)
@@ -714,26 +761,31 @@ struct value *gt(struct list *args, struct value *in)
 
     // Ensure each value is greater than the last
     l = in->data.seq_val;
-    for(list_cursor_begin(l); l->cursor; list_next(l))
+    for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
     {
         // First element gets a pass
         if(!last)
         {
-            last = list_at_cursor(l);
+            last = cursor_get(c);
         }
         else
         {
-            if(__order_values(list_at_cursor(l), last) == -2)
+            if(__order_values(cursor_get(c), last) == -2)
             {
                 out->type = BOTTOM_VAL;
+                cursor_delete(c);
                 return out;
             }
 
-            if(__order_values(last, list_at_cursor(l)) <= 0)
+            if(__order_values(last, cursor_get(c)) <= 0)
+            {
+                cursor_delete(c);
                 return out;
-            last = list_at_cursor(l);
+            }
+            last = cursor_get(c);
         }
     }
+    cursor_delete(c);
 
     out->data.bool_val = 1;
     return out;
@@ -750,6 +802,7 @@ struct value *gte(struct list *args, struct value *in)
 {
     struct value *out = value_new();
     struct list *l = NULL;
+    struct cursor *c = NULL;
     void *last = NULL;
 
     if(in->type != SEQ_VAL)
@@ -760,26 +813,31 @@ struct value *gte(struct list *args, struct value *in)
 
     // Ensure each value is greater than the last
     l = in->data.seq_val;
-    for(list_cursor_begin(l); l->cursor; list_next(l))
+    for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
     {
         // First element gets a pass
         if(!last)
         {
-            last = list_at_cursor(l);
+            last = cursor_get(c);
         }
         else
         {
-            if(__order_values(list_at_cursor(l), last) == -2)
+            if(__order_values(cursor_get(c), last) == -2)
             {
                 out->type = BOTTOM_VAL;
+                cursor_delete(c);
                 return out;
             }
 
-            if(__order_values(last, list_at_cursor(l)) < 0)
+            if(__order_values(last, cursor_get(c)) < 0)
+            {
+                cursor_delete(c);
                 return out;
-            last = list_at_cursor(l);
+            }
+            last = cursor_get(c);
         }
     }
+    cursor_delete(c);
 
     out->data.bool_val = 1;
     return out;
@@ -989,6 +1047,7 @@ struct value *tail(struct list *args, struct value *in)
 {
     struct value *out = value_new();
     struct list *l = NULL;
+    struct cursor *c = NULL;
 
     if(in->type != SEQ_VAL)
     {
@@ -1001,8 +1060,11 @@ struct value *tail(struct list *args, struct value *in)
     if(in->data.seq_val->count > 0)
     {
         l = in->data.seq_val;
-        for(list_cursor_begin(l), list_next(l); l->cursor; list_next(l))
-            list_push_back(out->data.seq_val, value_copy(list_at_cursor(l)));
+        for(c = cursor_new_front(l), cursor_next(c)
+                ; cursor_valid(c)
+                ; cursor_next(c))
+            list_push_back(out->data.seq_val, value_copy(cursor_get(c)));
+        cursor_delete(c);
     }
 
     return out;

@@ -31,9 +31,14 @@ struct list_node
 struct list
 {
     int count;
-    struct list_node *cursor;
     struct list_node *front;
     struct list_node *back;
+};
+
+struct cursor
+{
+    struct list *list;
+    struct list_node *cursor;
 };
 
 // Returns an empty list
@@ -56,15 +61,25 @@ void *list_get(struct list *list, int element);
 // Removes an item from the list
 void *list_remove(struct list *list, int element);
 
-// Sets the cursor to the beginning of the list
-void list_cursor_begin(struct list *list);
-// Sets the cursor to the end of the list
-void list_cursor_end(struct list *list);
-// Returns the item at the cursor
-void *list_at_cursor(struct list *list);
-// Increments the cursor
-void list_next(struct list *list);
-// Decrements the cursor
-void list_prev(struct list *list);
+// Returns a new cursor starting at the beginning of a list
+struct cursor *cursor_new_front(struct list *list);
+// Returns a new cursor starting at the back of a list
+struct cursor *cursor_new_back(struct list *list);
+// Deletes a cursor
+void cursor_delete(struct cursor *cursor);
+
+// Steps a cursor forward one element
+void cursor_next(struct cursor *cursor);
+// Steps a cursor back one element
+void cursor_prev(struct cursor *cursor);
+// Sets a cursor back to the front of the list
+void cursor_rewind(struct cursor *cursor);
+// Sets a cursor to the end of the list
+void cursor_ffwd(struct cursor *cursor);
+
+// Retrieves the current element pointed at by the cursor
+void *cursor_get(struct cursor *cursor);
+// Returns non-zero if cursor points to a valid list element
+void *cursor_valid(struct cursor *cursor);
 
 #endif // LIST_H

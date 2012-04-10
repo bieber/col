@@ -37,15 +37,17 @@ struct value *compose(struct list *args, struct value *in)
     struct value *current = in;
     struct value *last = in;
     struct function *f = NULL;
+    struct cursor *c = NULL;
 
     // Stepping backwards through the list of arguments and feeding
     // input to successive functions, deleting intermediate values
-    for(list_cursor_end(args); args->cursor; list_prev(args))
+    for(c = cursor_new_back(args); cursor_valid(c); cursor_prev(c))
     {
-        f = list_at_cursor(args);
+        f = cursor_get(c);
         last = current;
         current = function_exec(f, current);
     }
+    cursor_delete(c);
     
     return current;
 }
@@ -60,16 +62,18 @@ struct value *compose(struct list *args, struct value *in)
 struct value *construct(struct list *args, struct value *in)
 {
     struct value *out = value_new();
+    struct cursor *c = NULL;
 
     out->type = SEQ_VAL;
     out->data.seq_val = list_new();
 
-    for(list_cursor_begin(args); args->cursor; list_next(args))
+    for(c = cursor_new_front(args); cursor_valid(c); cursor_next(c))
     {
         list_push_back(out->data.seq_val, 
-                       function_exec(list_at_cursor(args), value_copy(in)));
+                       function_exec(cursor_get(c), value_copy(in)));
     }
     value_delete(in);
+    cursor_delete(c);
     return out;
 }
 
@@ -130,6 +134,7 @@ struct value *map(struct list *args, struct value *in)
     struct value *out = NULL;
     struct function *f = list_get(args, 0);
     struct list *l = NULL;
+    struct cursor *c;
 
     // First ensure valid input
     if(args->count != 1 || in->type != SEQ_VAL)
@@ -145,11 +150,12 @@ struct value *map(struct list *args, struct value *in)
 
     l = in->data.seq_val;
 
-    for(list_cursor_begin(l); l->cursor; list_next(l))
+    for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
         list_push_back(out->data.seq_val,
-                       function_exec(f, value_copy(list_at_cursor(l))));
+                       function_exec(f, value_copy(cursor_get(c))));
     
     value_delete(in);
+    cursor_delete(c);
     return out;
 
 }
