@@ -36,7 +36,7 @@ RUNNING COL
 
 To execute a file, simply run
 
-col [-v] <source file> [optional command line arguments]
+  colint [-v] <source file> [optional command line arguments]
 
 and the interpreter will load the code in program.col and execute its main
 function.  The main function is called with any command-line arguments passed
