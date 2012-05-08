@@ -48,8 +48,7 @@ main = compose{ print-list, map{ str }, collatz-seq, int, head }
 even = 
 compose{
   eq,
-  construct{ const(0), compose{ mod, construct{ id, const(2) }}}
-}
+  construct{ const(0), compose{ mod, construct{ id, const(2) }}}}
 
 # Similar to the even function, but simpler: just compares its input to 1
 
@@ -63,8 +62,7 @@ collatz-step =
 if{ 
   even, 
   compose{ /, construct{ id, const(2) }},
-  compose{ 1+, compose{ *, construct{ id, const(3) }}}
-}
+  compose{ 1+, compose{ *, construct{ id, const(3) }}}}
 
 # Given the starting element of a collatz sequence, generates the entire 
 # sequence that follows from it.  It operates by recursively calling 
