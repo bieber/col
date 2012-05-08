@@ -20,6 +20,7 @@
 "prepend",
 "print",
 "println",
+"readln",
 "str",
 "tail",
 ""

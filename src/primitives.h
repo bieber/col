@@ -197,6 +197,13 @@ struct value *print_str(struct list *args, struct value *in);
  */
 struct value *println_str(struct list *args, struct value *in);
 
+/*** readln
+ * Reads a line of input from the terminal.
+ * Input - Any non-bottom value.
+ * Output - A string containing a line read from the user.
+ */
+struct value *readln_str(struct list *args, struct value *in);
+
 /*** head
  * Returns the first element of a sequence.
  * Input - A sequence.

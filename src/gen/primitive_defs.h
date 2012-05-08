@@ -20,5 +20,6 @@ mod,
 prepend,
 print_str,
 println_str,
+readln_str,
 to_string,
 tail

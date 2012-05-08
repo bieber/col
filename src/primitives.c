@@ -1011,6 +1011,37 @@ struct value *println_str(struct list *args, struct value *in)
     return value_copy(in);
 }
 
+/*** readln
+ * Reads a line of input from the terminal.
+ * Input - Any non-bottom value.
+ * Output - A string containing a line read from the user.
+ */
+struct value *readln_str(struct list *args, struct value *in)
+{
+    int bufsize = 100;
+    int i = 0;
+    struct value *out = value_new();
+    out->type = STRING_VAL;
+    out->data.str_val = malloc(sizeof(char) * bufsize);
+
+    for(i = 0; 1; i++)
+    {
+        out->data.str_val[i] = fgetc(stdin);
+        
+        if(out->data.str_val[i] == '\n')
+        {
+            out->data.str_val[i] = '\0';
+            return out;
+        }
+        
+        if(i == bufsize - 1)
+        {
+            bufsize *= 2;
+            out->data.str_val = realloc(out->data.str_val, bufsize);
+        }
+    }
+}
+
 /*** head
  * Returns the first element of a sequence.
  * Input - A sequence.

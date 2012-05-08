@@ -141,6 +141,11 @@ println:
 * unchanged, the println function prints its string input to the screen with an
 * additional newline at the end.
 
+readln:
+* Reads a line of input from the terminal.
+* Input - Any non-bottom value.
+* Output - A string containing a line read from the user.
+
 str:
 * String conversion function.
 * Input - Any value other than bottom.
