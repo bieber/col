@@ -31,7 +31,7 @@
 /*** +
  * Basic addition function.
  * Input - A sequence of numbers, integer or floating point.
- * Output - The sum of the input numbers, floating point if any of the input 
+ * Output - The sum of the input numbers, floating point if any of the input
  * numbers was floating point, integer otherwise.
  */
 struct value *add(struct list *args, struct value *in)
@@ -71,7 +71,7 @@ struct value *add(struct list *args, struct value *in)
             {
                 is_float = 1;
                 fval = ival + e->data.float_val;
-            }   
+            }
         }
         else
         {
@@ -99,8 +99,8 @@ struct value *add(struct list *args, struct value *in)
 /*** -
  * Basic subtraction function.
  * Input - A sequence of numbers, integer or floating point.
- * Output - The difference of each of the numbers, starting with the first 
- * value and subtracting each successive value in order.  Result is floating 
+ * Output - The difference of each of the numbers, starting with the first
+ * value and subtracting each successive value in order.  Result is floating
  * point if any of the input numbers are floating point.
  */
 struct value *subtract(struct list *args, struct value *in)
@@ -187,7 +187,7 @@ struct value *subtract(struct list *args, struct value *in)
 /*** *
  * Basic multiplication function.
  * Input - A sequence of numbers, integer or floating point.
- * Output - The product of the input numbers, floating point if any of the 
+ * Output - The product of the input numbers, floating point if any of the
  * inputs were floating point.
  */
 struct value *multiply(struct list *args, struct value *in)
@@ -256,8 +256,8 @@ struct value *multiply(struct list *args, struct value *in)
 /*** /
  * Basic division function.
  * Input - A sequence of numbers, integer or floating point.
- * Output - The quotient of each of the numbers, starting with the first 
- * value and subtracting each successive value in order.  Result is a floating 
+ * Output - The quotient of each of the numbers, starting with the first
+ * value and subtracting each successive value in order.  Result is a floating
  * point number.
  */
 struct value *divide(struct list *args, struct value *in)
@@ -281,7 +281,7 @@ struct value *divide(struct list *args, struct value *in)
     for(c = cursor_new_front(l); cursor_valid(c); cursor_next(c))
     {
         e = cursor_get(c);
-        
+
         if(e->type == INT_VAL)
         {
             if(is_first)
@@ -504,9 +504,11 @@ int _compare_values(struct value *a, struct value *b)
         case CHAR_VAL:
             return a->data.char_val == b->data.char_val;
         case BOTTOM_VAL:
-            return 1;
+            return 0;
         case STRING_VAL:
             return !strcmp(a->data.str_val, b->data.str_val);
+        case SEQ_VAL:
+            return 0;
         }
     }
 
@@ -525,7 +527,7 @@ struct value *eq(struct list *args, struct value *in)
     struct value *last = NULL;
     struct list *l = NULL;
     struct cursor *c = NULL;
-    
+
     // Making sure we at least have a sequence
     if(in->type != SEQ_VAL || in->data.seq_val->count < 2)
         return out;
@@ -538,7 +540,7 @@ struct value *eq(struct list *args, struct value *in)
     c = cursor_new_front(l);
     last = cursor_get(c);
     cursor_next(c);
-    
+
     while(cursor_valid(c))
     {
         if(!_compare_values(last, cursor_get(c)))
@@ -572,7 +574,7 @@ int __order_values(struct value *a, struct value *b)
                 return -1;
             else if(a->data.int_val == b->data.int_val)
                 return 0;
-            else 
+            else
                 return 1;
         }
         else if(b->type == FLOAT_VAL)
@@ -588,7 +590,6 @@ int __order_values(struct value *a, struct value *b)
         {
             return -2;
         }
-
     case FLOAT_VAL:
         if(b->type == INT_VAL)
         {
@@ -612,24 +613,20 @@ int __order_values(struct value *a, struct value *b)
         {
             return -2;
         }
-
     case CHAR_VAL:
         if(b->type != CHAR_VAL)
             return -2;
-        
         if(a->data.char_val < b->data.char_val)
             return -1;
         else if(a->data.char_val == b->data.char_val)
             return 0;
         else
             return 1;
-
     case STRING_VAL:
         if(b->type != STRING_VAL)
             return -2;
 
         return strcmp(a->data.str_val, b->data.str_val);
-
     default:
         return -2;
     }
@@ -637,7 +634,7 @@ int __order_values(struct value *a, struct value *b)
 
 /*** lt
  * Less-than comparator.
- * Input - A sequence consisting either of all numbers, all characters, or 
+ * Input - A sequence consisting either of all numbers, all characters, or
  * all strings.
  * Output - True if each successive element is ordered before the next, False
  * otherwise.
@@ -651,7 +648,7 @@ struct value *lt(struct list *args, struct value *in)
 
     if(in->type != SEQ_VAL)
         return out;
-    
+
     out->type = BOOL_VAL;
     out->data.bool_val = 0;
 
@@ -703,7 +700,7 @@ struct value *lte(struct list *args, struct value *in)
 
     if(in->type != SEQ_VAL)
         return out;
-    
+
     out->type = BOOL_VAL;
     out->data.bool_val = 0;
 
@@ -743,7 +740,7 @@ struct value *lte(struct list *args, struct value *in)
  * Greater-than comparator.
  * Input - A sequence consisting either of all numbers, all characters, or all
  * strings.
- * Output - True if each successive element is ordered after the next, False 
+ * Output - True if each successive element is ordered after the next, False
  * otherwise.
  */
 struct value *gt(struct list *args, struct value *in)
@@ -755,7 +752,7 @@ struct value *gt(struct list *args, struct value *in)
 
     if(in->type != SEQ_VAL)
         return out;
-    
+
     out->type = BOOL_VAL;
     out->data.bool_val = 0;
 
@@ -795,7 +792,7 @@ struct value *gt(struct list *args, struct value *in)
  * Greater-than-or-equal-to comparator.
  * Input - A sequence consisting either of all numbers, all characters, or all
  * strings.
- * Output - True if each successive element is ordered after or equal to the 
+ * Output - True if each successive element is ordered after or equal to the
  * next, False otherwise.
  */
 struct value *gte(struct list *args, struct value *in)
@@ -807,7 +804,7 @@ struct value *gte(struct list *args, struct value *in)
 
     if(in->type != SEQ_VAL)
         return out;
-    
+
     out->type = BOOL_VAL;
     out->data.bool_val = 0;
 
@@ -846,10 +843,10 @@ struct value *gte(struct list *args, struct value *in)
 /*** int
  * Integer conversion function.
  * Input - Any value other than bottom.
- * Output - A conversion of the input value to an integer.  Floats are 
- * truncated, integers are passed through verbatim.  True becomes 1, False 
- * becomes 0.  Chars are converted to their ASCII values.  Strings are 
- * converted with the C atoi function.  Sequences simply return the sequence 
+ * Output - A conversion of the input value to an integer.  Floats are
+ * truncated, integers are passed through verbatim.  True becomes 1, False
+ * becomes 0.  Chars are converted to their ASCII values.  Strings are
+ * converted with the C atoi function.  Sequences simply return the sequence
  * length.
  */
 struct value *to_int(struct list *args, struct value *in)
@@ -862,25 +859,23 @@ struct value *to_int(struct list *args, struct value *in)
     case INT_VAL:
         out->data.int_val = in->data.int_val;
         break;
-        
     case FLOAT_VAL:
         out->data.int_val = (int)in->data.float_val;
         break;
-
     case CHAR_VAL:
         out->data.int_val = (int)in->data.char_val;
         break;
-        
     case STRING_VAL:
         out->data.int_val = atoi(in->data.str_val);
         break;
-
     case BOOL_VAL:
         out->data.int_val = in->data.bool_val ? 1 : 0;
         break;
-
     case SEQ_VAL:
         out->data.int_val = in->data.seq_val->count;
+        break;
+    case BOTTOM_VAL:
+        out->data.int_val = 0;
         break;
     }
 
@@ -890,11 +885,11 @@ struct value *to_int(struct list *args, struct value *in)
 /*** float
  * Floating point conversion function.
  * Input - Any value other than bottom.
- * Output - A conversion of the input value to a floating point number.  
- * Integers are simply cast to floating point, floating point numbers are 
- * passed through verbatim.  True becomes 1.0, False becomes 0.0.  Chars are 
- * converted to their ASCII values and then cast to floating point.  Strings 
- * are converted with the C atof funciton.  Sequences simply return the 
+ * Output - A conversion of the input value to a floating point number.
+ * Integers are simply cast to floating point, floating point numbers are
+ * passed through verbatim.  True becomes 1.0, False becomes 0.0.  Chars are
+ * converted to their ASCII values and then cast to floating point.  Strings
+ * are converted with the C atof funciton.  Sequences simply return the
  * sequence length.
  */
 struct value *to_float(struct list *args, struct value *in)
@@ -907,25 +902,23 @@ struct value *to_float(struct list *args, struct value *in)
     case INT_VAL:
         out->data.float_val = (double)in->data.int_val;
         break;
-        
     case FLOAT_VAL:
         out->data.float_val = in->data.float_val;
         break;
-
     case CHAR_VAL:
         out->data.float_val = (double)((int)in->data.char_val);
         break;
-
     case STRING_VAL:
         out->data.float_val = atof(in->data.str_val);
         break;
-
     case BOOL_VAL:
         out->data.float_val = in->data.bool_val ? 1.0 : 0.0;
         break;
-        
     case SEQ_VAL:
         out->data.float_val = (float)in->data.seq_val->count;
+        break;
+    case BOTTOM_VAL:
+        out->data.float_val = 0.;
         break;
     }
 
@@ -948,28 +941,26 @@ struct value *to_string(struct list *args, struct value *in)
     case INT_VAL:
         snprintf(out->data.str_val, 1024, "%d", in->data.int_val);
         break;
-
     case FLOAT_VAL:
         snprintf(out->data.str_val, 1024, "%lf", in->data.float_val);
         break;
-
     case CHAR_VAL:
         snprintf(out->data.str_val, 1024, "%c", in->data.char_val);
         break;
-
     case STRING_VAL:
         free(out->data.str_val);
         out->data.str_val = strdup(in->data.str_val);
         break;
-
     case BOOL_VAL:
         snprintf(out->data.str_val, 1024, "%s",
                  in->data.bool_val ? "True" : "False");
         break;
-
     case SEQ_VAL:
         snprintf(out->data.str_val, 1024, "Sequence of length %d",
                  in->data.seq_val->count);
+        break;
+    case BOTTOM_VAL:
+        snprintf(out->data.str_val, 1024, "%s", "Bottom");
         break;
     }
 
@@ -979,8 +970,8 @@ struct value *to_string(struct list *args, struct value *in)
 /*** print
  * Prints output to the screen.
  * Input - A string value.
- * Output - The same string that was passed in as input, or bottom if a 
- * non-string is passed in.  In additition to passing its input through 
+ * Output - The same string that was passed in as input, or bottom if a
+ * non-string is passed in.  In additition to passing its input through
  * unchanged, the print function prints its string input out to the screen.
  */
 struct value *print_str(struct list *args, struct value *in)
@@ -989,15 +980,15 @@ struct value *print_str(struct list *args, struct value *in)
         return value_new();
 
     printf("%s", in->data.str_val);
-    
+
     return value_copy(in);
 }
 
 /*** println
  * Prints output to a line on the screen.
  * Input - A string value.
- * Output - The same string that was passed in as input, or bottom if a 
- * non-string is passed in.  In addition to passing its input through 
+ * Output - The same string that was passed in as input, or bottom if a
+ * non-string is passed in.  In addition to passing its input through
  * unchanged, the println function prints its string input to the screen with an
  * additional newline at the end.
  */
@@ -1005,7 +996,7 @@ struct value *println_str(struct list *args, struct value *in)
 {
     if(in->type != STRING_VAL)
         return value_new();
-    
+
     printf("%s\n", in->data.str_val);
 
     return value_copy(in);
@@ -1027,13 +1018,13 @@ struct value *readln_str(struct list *args, struct value *in)
     for(i = 0; 1; i++)
     {
         out->data.str_val[i] = fgetc(stdin);
-        
+
         if(out->data.str_val[i] == '\n')
         {
             out->data.str_val[i] = '\0';
             return out;
         }
-        
+
         if(i == bufsize - 1)
         {
             bufsize *= 2;
@@ -1084,7 +1075,7 @@ struct value *tail(struct list *args, struct value *in)
     {
         return out;
     }
-    
+
     out->type = SEQ_VAL;
     out->data.seq_val = list_new();
 
@@ -1109,7 +1100,7 @@ struct value *tail(struct list *args, struct value *in)
 struct value *length(struct list *args, struct value *in)
 {
     struct value *out = value_new();
-    
+
     if(in->type != SEQ_VAL && in->type != STRING_VAL)
         return out;
 
@@ -1118,7 +1109,7 @@ struct value *length(struct list *args, struct value *in)
         out->data.int_val = in->data.seq_val->count;
     else
         out->data.int_val = strlen(in->data.str_val);
-    
+
     return out;
 }
 
@@ -1133,7 +1124,7 @@ struct value *append(struct list *args, struct value *in)
     struct list *l = NULL;
 
     if(in->type != SEQ_VAL
-       || in->data.seq_val->count != 2 
+       || in->data.seq_val->count != 2
        || ((struct value*)list_get(in->data.seq_val, 1))->type != SEQ_VAL)
         return out;
 
@@ -1146,7 +1137,7 @@ struct value *append(struct list *args, struct value *in)
 /*** prepend
  * Prepends an item to the beginning of a sequence.
  * Input - A sequence of length 2.  The second element must be a list.
- * Output - The first element of the input prepended to the beginning of the 
+ * Output - The first element of the input prepended to the beginning of the
  * second.
  */
 struct value *prepend(struct list *args, struct value *in)
@@ -1155,7 +1146,7 @@ struct value *prepend(struct list *args, struct value *in)
     struct list *l = NULL;
 
     if(in->type != SEQ_VAL
-       || in->data.seq_val->count != 2 
+       || in->data.seq_val->count != 2
        || ((struct value*)list_get(in->data.seq_val, 1))->type != SEQ_VAL)
         return out;
 

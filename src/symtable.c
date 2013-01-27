@@ -41,7 +41,7 @@ struct symtable *symtable_new()
 }
 
 // Deletes a symtable
-struct symtable *symtable_delete(struct symtable *table)
+void symtable_delete(struct symtable *table)
 {
     int i;
     struct list *list = NULL;

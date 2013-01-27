@@ -42,7 +42,7 @@ struct symtable_entry
 // Creates a new symtable
 struct symtable *symtable_new();
 // Deletes a symtable
-struct symtable *symtable_delete();
+void symtable_delete();
 
 // Adds an entry to the table
 void symtable_add(struct symtable *table, char *name, struct function *data);

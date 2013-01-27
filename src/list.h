@@ -59,7 +59,7 @@ void list_push_back(struct list *list, void *element);
 // Fetches an item from the list
 void *list_get(struct list *list, int element);
 // Removes an item from the list
-void *list_remove(struct list *list, int element);
+void list_remove(struct list *list, int element);
 
 // Returns a new cursor starting at the beginning of a list
 struct cursor *cursor_new_front(struct list *list);
@@ -80,6 +80,6 @@ void cursor_ffwd(struct cursor *cursor);
 // Retrieves the current element pointed at by the cursor
 void *cursor_get(struct cursor *cursor);
 // Returns non-zero if cursor points to a valid list element
-void *cursor_valid(struct cursor *cursor);
+int cursor_valid(struct cursor *cursor);
 
 #endif // LIST_H

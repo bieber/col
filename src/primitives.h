@@ -26,7 +26,7 @@ struct value;
 /**
  * The functions and comments in this header file will be parsed and
  * turned into documentation and array definitions by a script.  Every
- * function definition should be preceded by /*** function-name where
+ * function definition should be preceded by *** function-name where
  * function-name is the col-legal name of the primitive function.
  * Each line of the comment thereafter will be included in the
  * documentation.

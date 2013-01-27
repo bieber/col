@@ -36,7 +36,7 @@ void list_delete(struct list *list)
 {
     struct list_node *current = list->front;
     struct list_node *next = NULL;
-    
+
     if(!list)
         return;
 
@@ -54,7 +54,7 @@ void *list_pop(struct list *list)
 {
     void *retval = NULL;
     struct list_node *old = NULL;
-    
+
     // Check for empty list
     if(!list->front)
         return NULL;
@@ -66,7 +66,7 @@ void *list_pop(struct list *list)
         list->front->next->prev = NULL;
     else
         list->back = NULL;
-    
+
     list->front = list->front->next;
     free(old);
     list->count--;
@@ -76,7 +76,7 @@ void *list_pop(struct list *list)
 // Pushes an item onto the front of the list
 void list_push(struct list *list, void *element)
 {
-    struct list_node *new_node = 
+    struct list_node *new_node =
         (struct list_node*)malloc(sizeof(struct list_node));
     new_node->data = element;
     new_node->next = list->front;
@@ -102,12 +102,12 @@ void *list_pop_back(struct list *list)
 
     retval = list->back->data;
     old = list->back;
-    
+
     if(list->back->prev)
         list->back->prev->next = NULL;
     else
         list->front = NULL;
-    
+
     list->back = list->back->prev;
     free(old);
     list->count--;
@@ -118,7 +118,7 @@ void *list_pop_back(struct list *list)
 // Pushes an item onto the back of the list
 void list_push_back(struct list *list, void *element)
 {
-    struct list_node *new_node = 
+    struct list_node *new_node =
         (struct list_node*)malloc(sizeof(struct list_node));
     new_node->data = element;
     new_node->next = NULL;
@@ -137,7 +137,7 @@ void *list_get(struct list *list, int element)
 {
     int i;
     struct list_node *src = NULL;
-    
+
     if(element >= list->count || element < 0)
     {
         // Out-of-bounds index
@@ -161,7 +161,7 @@ void *list_get(struct list *list, int element)
     return src->data;
 }
 // Removes an item from the list
-void *list_remove(struct list *list, int element)
+void list_remove(struct list *list, int element)
 {
     int i;
     struct list_node *old = NULL;
@@ -206,6 +206,7 @@ struct cursor *cursor_new_front(struct list *list)
     struct cursor *c = (struct cursor*)malloc(sizeof(struct cursor));
     c->list = list;
     c->cursor = list->front;
+    return c;
 }
 
 // Returns a new cursor starting at the back of a list
@@ -214,6 +215,7 @@ struct cursor *cursor_new_back(struct list *list)
     struct cursor *c = (struct cursor*)malloc(sizeof(struct cursor));
     c->list = list;
     c->cursor = list->back;
+    return c;
 }
 
 // Deletes a cursor
@@ -262,7 +264,7 @@ void *cursor_get(struct cursor *cursor)
 }
 
 // Returns non-zero if cursor points to a valid list element
-void *cursor_valid(struct cursor *cursor)
+int cursor_valid(struct cursor *cursor)
 {
     return cursor->cursor ? 1 : 0;
 }
