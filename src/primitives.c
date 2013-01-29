@@ -150,7 +150,7 @@ struct value *subtract(struct list *args, struct value *in)
         {
             if(is_first)
             {
-                ival = e->data.float_val;
+                ival = e->data.int_val;
                 is_first = 0;
             }
             else

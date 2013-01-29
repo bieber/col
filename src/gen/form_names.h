@@ -2,4 +2,5 @@
 "construct",
 "if",
 "map",
+"reduce",
 ""

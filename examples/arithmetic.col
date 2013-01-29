@@ -21,6 +21,6 @@
  ##
 
 # Simple demonstration of some arithmetic primitives
-main = compose{println, str, /, construct{ const(6), 
+main = compose{println, str, /, construct{ const(6),
                                            compose{ +, const(<2, 1>) }}}
 

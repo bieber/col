@@ -67,8 +67,19 @@ struct value *iff(struct list *args, struct value *in);
  * form should always be in the form of a list, and the return value will be
  * the result of applying the argument function to each element in the list.
  *
- * map{ f } : < x, y, z> = < f : x, f : y, f : z >
+ * map{ f } : < x, y, z > = < f : x, f : y, f : z >
  */
 struct value *map(struct list *args, struct value *in);
+
+/*** reduce
+ * Reducing functional form.  Accepts a single function argument.  Expects
+ * input in the form of a list, return value is the result of first applying
+ * the argument function to a pair formed from the first two elements of the
+ * input list, then forming a new pair from that result and the next
+ * right-most element, and so on until the list is exhausted.
+ *
+ * reduce{ f } : < x, y, z > = f : < f : < x, y>, z >
+ */
+struct value *reduce(struct list *args, struct value *in);
 
 #endif // FORMS_H

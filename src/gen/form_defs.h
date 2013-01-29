@@ -1,4 +1,5 @@
 compose,
 construct,
 iff,
-map
+map,
+reduce
